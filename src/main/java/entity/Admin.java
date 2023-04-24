@@ -13,11 +13,14 @@ public class Admin extends User {
     // Data 
     private Map<String,Votee> votees;
     private Poll poll;
-    
-    
+
     // Constructor
     public Admin() {
-        this.votees = new HashMap<>();
+        this("admin", "admin123");
+    }
+    
+    public Admin(String username, String password) {
+        super(username, password);
     }
   
     

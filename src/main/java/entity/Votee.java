@@ -26,7 +26,7 @@ public class Votee {
     public String getName() {
         return name;
     }
-    
+
     public String getDescription() {
         return description;
     }
@@ -44,12 +44,12 @@ public class Votee {
         this.name = name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public void setVotes(int votes) {
         this.votes = votes;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
     
     public void addVote() {

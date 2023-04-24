@@ -1,9 +1,8 @@
 package entity;
 
-import java.util.HashMap;
+import adt.HashMap;
 import adt.ListInterface;
-import java.util.HashSet;
-import java.util.Map;
+import adt.MapInterface;
 
 /**
  *
@@ -23,7 +22,7 @@ public class Poll {
         this.pollStatus = new PollStatus();
         
         for(int i=0; i<voteeList.size(); i++) {
-            Map<Votee, Integer> voteCount = new HashMap();
+            MapInterface<Votee, Integer> voteCount = new HashMap<>();
             
             // Initialize the voteCount map 
             voteCount.put(voteeList.get(i), 0);
@@ -71,7 +70,7 @@ public class Poll {
     
     // Methods
     public void addVote(Votee votee) {
-        Map<Votee, Integer> newVote = new HashMap<>();
+        MapInterface<Votee, Integer> newVote = new HashMap<>();
         
         if (isOpen) {
             newVote.put(votee, pollStatus.getVoteCount().get(votee) + 1);

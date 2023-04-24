@@ -1,14 +1,14 @@
 package entity;
 
-import java.util.HashMap;
-import java.util.Map;
+import adt.HashMap;
+import adt.MapInterface;
 
 /**
  *
  * @author Joshua Koh Min En
  */
 public class PollStatus {
-    private Map<Votee, Integer> voteCount;
+    private MapInterface<Votee, Integer> voteCount;
     private long timeRemaining;
     
     public PollStatus() {
@@ -16,11 +16,11 @@ public class PollStatus {
         this.timeRemaining = 0;
     }
     
-    public Map<Votee, Integer> getVoteCount() {
+    public MapInterface<Votee, Integer> getVoteCount() {
         return voteCount;
     }
     
-    public void setVoteCount(Map<Votee, Integer> voteCount) {
+    public void setVoteCount(MapInterface<Votee, Integer> voteCount) {
         this.voteCount = voteCount;
     }
     
