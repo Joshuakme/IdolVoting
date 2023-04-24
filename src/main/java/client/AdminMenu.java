@@ -2,8 +2,8 @@ package client;
 
 import entity.Admin;
 import entity.Votee;
-import java.util.HashMap;
-import java.util.Map;
+import adt.HashMap;
+import adt.MapInterface;
 import java.util.Scanner;
 
 /**
@@ -24,7 +24,10 @@ public class AdminMenu {
             {"Login"}
         };
         
-        // Variables
+        // Variables Initialization
+        admin = initAdmin();
+        
+        // Status Variables
         boolean notExit = true;
         
 
@@ -41,16 +44,22 @@ public class AdminMenu {
             switch (choiceAdmin) {
                 case 1:
                 case 2:
-                    adminMenuLev2(MENU_ITEM_ARR,choiceAdmin);
-                    // Get level 2 choice
-                    System.out.print("Please select choice (1 - " + MENU_ITEM_ARR.length + "): ");
-                    int choiceAdmin2 = sc.nextInt();
-                    
-                    adminActionLev2(choiceAdmin,choiceAdmin2);
-                    break;
+                    if(!isLogged) {
+                        // Error Msg
+                        break;
+                    } else {
+                        adminMenuLev2(MENU_ITEM_ARR,choiceAdmin);
+                        // Get level 2 choice
+                        System.out.print("Please select choice (1 - " + MENU_ITEM_ARR.length + "): ");
+                        int choiceAdmin2 = sc.nextInt();
+
+                        adminActionLev2(choiceAdmin,choiceAdmin2);
+                        break;
+                    }
                 case 3:
                     // Assume admin credentials entered correctly
                     admin = new Admin();
+                    // Log in process
                     isLogged = true;
                     break;
                 case 0:
@@ -65,7 +74,7 @@ public class AdminMenu {
             Votee votee2 = new Votee("V002", "Justin Bieber", "A Canadian singer, songwriter, and multi-instrumentalist.");
             
             
-            HashMap<String, Votee> voteeMap = new HashMap<>();
+            MapInterface<String, Votee> voteeMap = new HashMap<>();
             voteeMap.put(votee1.getId(), votee1);
             voteeMap.put(votee2.getId(), votee2);
             
@@ -81,7 +90,12 @@ public class AdminMenu {
         }
     }
     
-    // Util Methods
+    // Init Methods
+    public static Admin initAdmin() {
+        return new Admin();
+    }
+    
+    // Display Methods
     public static void adminMenuLev1(String[][] menuItemArr) {          
         for(int i=0; i<menuItemArr.length; i++) {
             System.out.println((i+1) + ". " + menuItemArr[i][0]);
@@ -154,4 +168,6 @@ public class AdminMenu {
     public static void displayPollStatus() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+    
+    // Operation Methods
 }
