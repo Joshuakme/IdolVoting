@@ -1,40 +1,93 @@
 package client;
 
-// Import ADT
+import entity.Admin;
+import entity.Votee;
 import adt.HashMap;
 import adt.MapInterface;
-import adt.SortedList;
-import adt.SortedListInterface;
-// Import Entity
-import entity.Admin;
-import entity.Poll;
-import entity.Votee;
-import entity.Voter;
-// Import Util
 import java.util.Scanner;
-import java.util.InputMismatchException;
 
 /**
+ *
  * @author Joshua Koh Min En
- * @author Lai Chee Sheng
- * @author Lim Kang Yi
- * @author Shia Chai Fen
  */
-public class IdolVoting { 
+public class AdminMenu {
     // Global Variables
     private static Scanner sc = new Scanner(System.in);
     private static boolean isLogged = false;
     private static Admin admin;
     
     public static void main(String[] args) {
-        // CONSTANT
+        // Constant
+        String[][] MENU_ITEM_ARR = {
+            {"Votee", "Create Votee", "Update Votee", "Delete Votee"},
+            {"Poll", "Start Poll", "End Poll", "View PolL Status"},
+            {"Login"}
+        };
         
-        // Variable Initialization
+        // Variables Initialization
+        admin = initAdmin();
         
         // Status Variables
+        boolean notExit = true;
         
-        
-        System.out.println("Hello World!");
+
+        while(notExit) {
+            System.out.println("\n--- Welcome to ADMIN ---\n");
+            
+            // Display Admin Menu
+            adminMenuLev1(MENU_ITEM_ARR);    
+            
+            System.out.print("Please select choice (1 - " + MENU_ITEM_ARR.length + "): ");
+            int choiceAdmin = sc.nextInt();
+            sc.next();
+            
+            switch (choiceAdmin) {
+                case 1:
+                case 2:
+                    if(!isLogged) {
+                        // Error Msg
+                        break;
+                    } else {
+                        adminMenuLev2(MENU_ITEM_ARR,choiceAdmin);
+                        // Get level 2 choice
+                        System.out.print("Please select choice (1 - " + MENU_ITEM_ARR.length + "): ");
+                        int choiceAdmin2 = sc.nextInt();
+
+                        adminActionLev2(choiceAdmin,choiceAdmin2);
+                        break;
+                    }
+                case 3:
+                    // Assume admin credentials entered correctly
+                    admin = new Admin();
+                    // Log in process
+                    isLogged = true;
+                    break;
+                case 0:
+                    notExit = false;
+                    break;
+                default:
+                    break;
+            }
+            
+            
+            Votee votee1 = new Votee("V001", "Ariana Grande", "A popular American singer and songwriter.");
+            Votee votee2 = new Votee("V002", "Justin Bieber", "A Canadian singer, songwriter, and multi-instrumentalist.");
+            
+            
+            MapInterface<String, Votee> voteeMap = new HashMap<>();
+            voteeMap.put(votee1.getId(), votee1);
+            voteeMap.put(votee2.getId(), votee2);
+            
+            // Update the description of votee1
+            votee1.setDescription("An award-winning singer with a powerful voice.");
+
+            // Update the entry in the HashMap
+            voteeMap.put(votee1.getId(), votee1);
+
+            // Delete votee2 from the HashMap
+            voteeMap.remove(votee2.getId());
+
+        }
     }
     
     // Init Methods
@@ -117,6 +170,4 @@ public class IdolVoting {
     }
     
     // Operation Methods
-    
-    // Utils Methods
 }
