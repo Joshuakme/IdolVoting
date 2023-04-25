@@ -29,11 +29,11 @@ public class Voter extends User{
         this.voterID = voterID;
     }
 
-    public String getVoteeName() {
+    public String getVoterName() {
         return voterName;
     }
 
-    public void setVoteeName(String voteeName) {
+    public void setVoterName(String voteeName) {
         this.voterName = voteeName;
     }
 
