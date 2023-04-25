@@ -8,7 +8,7 @@ import adt.MapInterface;
  *
  * @author Joshua Koh
  */
-public class Poll {
+public class Poll implements Comparable<Poll> {
     // Data Attribute
     private String name;
     private ListInterface<Votee> voteeList;
@@ -41,11 +41,11 @@ public class Poll {
         return voteeList;
     }
 
-    public PollStatus getPollStatus() {
+    public PollStatus getStatus() {
         return pollStatus;
     }
 
-    public boolean isIsOpen() {
+    public boolean isOpen() {
         return isOpen;
     }
     
@@ -68,7 +68,7 @@ public class Poll {
     }
     
     
-    // Methods
+    // Operation Methods
     public void addVote(Votee votee) {
         MapInterface<Votee, Integer> newVote = new HashMap<>();
         
@@ -80,17 +80,27 @@ public class Poll {
             throw new IllegalStateException("Poll is closed.");
         }
     }
-    
-    public PollStatus getStatus() {
-        return pollStatus;
-    }
-    
-    public boolean isOpen() {
-        return isOpen;
-    }
-    
+     
     public void end() {
         this.isOpen = false;
+    }
+
+    
+    // Comparable Methods
+    @Override
+    public int compareTo(Poll otherPoll) {
+        // compare based on total number of votes
+        int totalVotes = 0;
+        for (int voteCount : pollStatus.getVoteCount().values()) {
+            totalVotes += voteCount;
+        }
+
+        int otherTotalVotes = 0;
+        for (int voteCount : otherPoll.pollStatus.getVoteCount().values()) {
+            otherTotalVotes += voteCount;
+        }
+
+        return Integer.compare(otherTotalVotes, totalVotes);
     }
 }
 

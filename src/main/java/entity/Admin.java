@@ -2,8 +2,8 @@ package entity;
 
 import adt.ArrayList;
 import adt.ListInterface;
-import java.util.Map;
-import java.util.HashMap;
+import adt.MapInterface;
+import adt.HashMap;
 
 /**
  *
@@ -11,12 +11,13 @@ import java.util.HashMap;
  */
 public class Admin extends User {
     // Data 
-    private Map<String,Votee> votees;
+    private MapInterface<String,Votee> votees;
     private Poll poll;
 
     // Constructor
     public Admin() {
         this("admin", "admin123");
+        this.votees = new HashMap<>();
     }
     
     public Admin(String username, String password) {
@@ -25,7 +26,7 @@ public class Admin extends User {
   
     
     // Getter
-    public Map<String,Votee> getVotees() {
+    public MapInterface<String,Votee> getVotees() {
         return votees;
     }
 
@@ -35,7 +36,7 @@ public class Admin extends User {
     
     
     // Setter 
-    public void setVotees(Map<String, Votee> votees) {
+    public void setVotees(MapInterface<String, Votee> votees) {
         this.votees = votees;
     }
 
@@ -57,6 +58,22 @@ public class Admin extends User {
     
     public void deleteVotee(String voteeId) {
         votees.remove(voteeId);
+    }
+    
+    public ListInterface<Votee> searchVotee(String voteeName) {
+        if (voteeName == null || voteeName.isEmpty()) {
+            return null;
+        }
+        
+        ListInterface<Votee> matchedVoteeList = new ArrayList<>();
+
+        for (MapInterface.Entry<String, Votee> pairEntry : votees.entrySet()) {
+            if (pairEntry.getKey().toUpperCase().contains(voteeName.toUpperCase())) {
+                matchedVoteeList.add(pairEntry.getValue());
+            }
+        }
+
+        return matchedVoteeList;
     }
 
     
