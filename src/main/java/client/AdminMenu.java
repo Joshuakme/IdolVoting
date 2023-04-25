@@ -105,6 +105,30 @@ public class AdminMenu {
         System.out.print("\n");
     }
     
+    public static void displayAvailablePolls() {
+        // Variables Init
+        SortedList<Poll> availablePollList = getAvailablePolls();
+                    
+        // Display the list of available polls
+        System.out.println("\nBelow is the list of available Polls: ");
+        System.out.printf("%4s %-20s","No.", "Poll Name");
+        for(int i=0; i<availablePollList.size(); i++) {
+            System.out.printf("%4s %-20s", (i+1) + ". ", availablePollList.get(i).getName());
+        }
+        System.out.println("\n");
+    }
+    
+    public static void displayVoteeList(ListInterface<Votee> voteeList) {
+        // Display the list of matchced votee
+        System.out.println("\nBelow is the list of Votee that matched the entered name:");
+        System.out.printf("%4s %-8s %-10s %-20s","No.", "Votee ID", "Votee Name", "Votee Desc");
+        for(int i=0; i<voteeList.size(); i++) {
+            System.out.printf("%4s %-8s %-10s %-20s", (i+1) + ". ", voteeList.get(i).getId(), voteeList.get(i).getName(), voteeList.get(i).getDescription());
+        }
+        System.out.println("\n");
+    }
+    
+    // Operation Methods
     public static void adminActionLev2(int choiceAdminLevel1,int choiceAdminLevel2) {
         if(choiceAdminLevel1 == 1) {
             // Votee
@@ -159,12 +183,7 @@ public class AdminMenu {
                             boolean validselectedVoteeIndex = false;
                             
                             while(!validselectedVoteeIndex) {
-                                // Display the list of matchced votee
-                                System.out.println("\nBelow is the list of Votee that matched the entered name:");
-                                System.out.printf("%4s %-8s %-10s %-20s","No.", "Votee ID", "Votee Name", "Votee Desc");
-                                for(int i=0; i<searchedVoteeList.size(); i++) {
-                                    System.out.printf("%4s %-8s %-10s %-20s", (i+1) + ". ", searchedVoteeList.get(i).getId(), searchedVoteeList.get(i).getName(), searchedVoteeList.get(i).getDescription());
-                                }
+                                displayVoteeList(searchedVoteeList);
 
                                 // Get confirmed Votee
                                 System.out.print("Please select the Votee you would like to update: ");
@@ -240,13 +259,7 @@ public class AdminMenu {
                             boolean validSelectedVoteeIndex = false;
                             
                             while(!validSelectedVoteeIndex) {    
-                                // Display the list of matchced votee
-                                System.out.println("\nBelow is the list of Votee that matched the entered name:");
-                                System.out.printf("%4s %-8s %-10s %-20s","No.", "Votee ID", "Votee Name", "Votee Desc");
-                                for(int i=0; i<searchedVoteeList.size(); i++) {
-                                    System.out.printf("%4s %-8s %-10s %-20s", (i+1) + ". ", searchedVoteeList.get(i).getId(), searchedVoteeList.get(i).getName(), searchedVoteeList.get(i).getDescription());
-                                }
-                                System.out.println("\n");
+                                displayVoteeList(searchedVoteeList);
 
                                 // Get confirmed Votee
                                 System.out.print("Please select the Votee you would like to delete: ");
@@ -254,7 +267,7 @@ public class AdminMenu {
                                 sc.nextLine();
 
                                 // Check if valid selectedVoteeIndex
-                                if(selectedVoteeIndex > 0 && selectedVoteeIndex < searchedVoteeList.size()) {
+                                if(selectedVoteeIndex > 0 && selectedVoteeIndex <= searchedVoteeList.size()) {
                                     boolean validConfirmDeleteVoteeInput = false;
                                     
                                     while(!validConfirmDeleteVoteeInput) {
@@ -315,24 +328,11 @@ public class AdminMenu {
                 case 2:
                     // End Poll
                     boolean validEndPollInput = false;
-                    
-                    // Get list of available polls
-                    SortedList<Poll> availablePollList = new SortedList<>();
-
-                    for(int i=0; i<pollLinkedList.size(); i++) {
-                        if(pollLinkedList.get(i).isOpen()) {
-                            availablePollList.add(pollLinkedList.get(i));
-                        }
-                    }
                         
                     while(!validEndPollInput) {
-                        // Display the list of available polls
-                        System.out.println("\nBelow is the list of available Polls: ");
-                        System.out.printf("%4s %-20s","No.", "Poll Name");
-                        for(int i=0; i<availablePollList.size(); i++) {
-                            System.out.printf("%4s %-20s", (i+1) + ". ", availablePollList.get(i).getName());
-                        }
-                        System.out.println("\n");
+                        displayAvailablePolls();
+                        
+                        SortedList<Poll> availablePollList = getAvailablePolls();
                         
                         // Get confirmed Votee
                         System.out.print("Please select the Poll you would like to end: ");
@@ -340,7 +340,7 @@ public class AdminMenu {
                         sc.nextLine();
                         
                         // Check if valid endPollInput
-                        if(endPollInput > 0 && endPollInput < availablePollList.size()) {
+                        if(endPollInput > 0 && endPollInput <= availablePollList.size()) {
                             boolean validConfirmEndPollInput = false;
                             
                             while(!validConfirmEndPollInput) {
@@ -381,5 +381,52 @@ public class AdminMenu {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
-    // Operation Methods
+    // Util Methods
+    public static SortedList<Poll> getAvailablePolls() {
+        // Variables Init
+        SortedList<Poll> availablePollList = new SortedList<>();
+
+        // Get list of available polls
+        for(int i=0; i<pollLinkedList.size(); i++) {
+            if(pollLinkedList.get(i).isOpen()) {
+                availablePollList.add(pollLinkedList.get(i));
+            }
+        }
+        
+        return availablePollList;
+    }
+    
+    public static int getCurVotingPollIndex() {
+        boolean validCurVotingPollIndex = false;
+        
+        while(!validCurVotingPollIndex) {
+            SortedList<Poll> availablePollList = getAvailablePolls();
+                    
+            System.out.println("Below is the list of available Polls");
+        
+            // Display Available Polls
+            displayAvailablePolls();
+
+            // Get input from user
+            System.out.println("Please select a poll to proceed: ");
+            int curVotingPollIndex = sc.nextInt();
+            sc.nextLine();
+            
+            if(curVotingPollIndex > 0 && curVotingPollIndex <= availablePollList.size()) {
+                // Proceed
+                
+                
+            } else {
+                // If invalid endPollInput
+
+                System.err.println("\nPlease enter a number that is in the range of (1 - " + availablePollList.size() + "). Please try again\n");
+            }
+        }
+        
+        return -1;
+    }
+    
+
+    
+
 }
