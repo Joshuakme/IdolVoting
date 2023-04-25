@@ -409,12 +409,12 @@ public class AdminMenu {
 
             // Get input from user
             System.out.println("Please select a poll to proceed: ");
-            int curVotingPollIndex = sc.nextInt();
+            int curVotingPollIndexInput = sc.nextInt();
             sc.nextLine();
             
-            if(curVotingPollIndex > 0 && curVotingPollIndex <= availablePollList.size()) {
+            if(curVotingPollIndexInput > 0 && curVotingPollIndexInput <= availablePollList.size()) {
                 // Proceed
-                
+                curVotingPollIndex = curVotingPollIndexInput;
                 
             } else {
                 // If invalid endPollInput
