@@ -7,7 +7,6 @@ import adt.LinkedList;
 import adt.ListInterface;
 import adt.MapInterface;
 import entity.Poll;
-import entity.Vote;
 import entity.Votee;
 import entity.Voter;
 import java.util.Scanner;
@@ -22,6 +21,7 @@ public class VoterMenu {
     private static Scanner sc = new Scanner(System.in);
     private static boolean isLogged = false;
     private static Voter curVoter; 
+    private static int curVoterIndex; 
     private static int curVotingPollIndex;
     
     public static void main(String[] args) {
@@ -56,27 +56,24 @@ public class VoterMenu {
                     break;
                     
                  case 3:
-                        //select Poll
-                     
-                        castVote();
+                    //select Poll
+                    selectPoll();
+
+                    //cast Vote
+                    castVote();
                     break;
                     
                  case 4:
+                    //View number of voters
                     int numberOfVoter = voterLinkedList.getNumberOfEntries(); //Obtain total voter involved 
                     System.out.println("The total number of voters currently is " + numberOfVoter + ".\n");
                     break;
                     
                  case 5:
                     // Remove a voter from the list
-                        Voter removeableVoter = voter1;
-                        boolean removed = removeableVoter.removeVoter(voterLinkedList);
-
-                        if (removed) {
-                            System.out.println("Successfully removed voter " + removeableVoter.getVoteeName() + " (" + removeableVoter.getVoterID() + ")");
-                        } else {
-                            System.out.println("Failed to remove voter " + removeableVoter.getVoteeName() + " (" + removeableVoter.getVoterID() + ")");
-                        }
-                        
+                    deleteVoterSelf();
+                    break;
+                    
                  default:
                 }
             } while(choice != 5 && choice != 6);
@@ -87,8 +84,8 @@ public class VoterMenu {
     public static LinkedList<Voter> initVoter() {
         LinkedList<Voter> voterLinkedList = new LinkedList<>();
         
-        Voter voter1 = new Voter("V1002","Joshua", "joshua@gmail.com", "Joshhh", "5678");
-        Voter voter2 = new Voter("V1003","User404", "user404@gmail.com", "Invalid", "8888");
+        Voter voter1 = new Voter("V1002","Joshua", "joshua@gmail.com", "Joshhh", "123");
+        Voter voter2 = new Voter("V1003","User404", "user404@gmail.com", "Invalid", "404");
         
         voterLinkedList.add(voter1);
         voterLinkedList.add(voter2);  
@@ -127,11 +124,12 @@ public class VoterMenu {
                 String tempPassword = sc.nextLine();
 
                 //Verify login detail with linked list contain
-                for(int i = 0; i < voterLinkedList.size(); i++){
-                    if(voterLinkedList.get(i).validateAccount(tempUsername, tempPassword)){
+                for(int i = 1; i < voterLinkedList.getNumberOfEntries(); i++){
+                    if(voterLinkedList.getEntry(i).validateAccount(tempUsername, tempPassword)){
                         isLogged = true;
-                        curVoter = voterLinkedList.get(i);
+                        curVoter = voterLinkedList.getEntry(i);
                         System.out.println("Login Successful!!");
+                        curVoterIndex = i;
                     }
                 }
                 if(!isLogged){
@@ -146,24 +144,23 @@ public class VoterMenu {
         }
     }
     
-    public static void castVote(){
-        if(checkVoted()){
-            System.out.println("Voter " + curVoter.getVoterID() + " has already voted!");      
-       
-        } else { //add vote if not yet vote 
-            voteCastableVotee();
-        }     
-            
-    }    
-    
     public static void selectPoll(){
-        
+        if(pollLinkedList.isEmpty()){ //if poll empty
+            System.out.println("There is no poll available to vote currently... (back menu)");
+        } else{
+            System.out.println("===========Poll List============");
+            for(int i = 1 ; i < pollLinkedList.getNumberOfEntries(); i++){
+                System.out.println("||" + i + ") " + pollLinkedList.getEntry(i).getName() );
+            }
+            
+            System.out.println("=> Select the poll to vote ( 1 - " + pollLinkedList.getNumberOfEntries() + " ): ");
+            curVotingPollIndex = sc.nextInt();
+        }
     }
-    
+        
     public static boolean checkVoted(){
-
         //Get list of voted Voter from votedList(from poll)
-        Poll curVotingPoll = pollLinkedList.get(curVotingPollIndex);
+        Poll curVotingPoll = pollLinkedList.getEntry(curVotingPollIndex);
         
         
         //Check and compare the voterID(get from main) with the voterId of list of voted Voter using contain
@@ -175,7 +172,7 @@ public class VoterMenu {
                 System.out.println("Voter " + curVoter.getVoterID() + " has already voted!");
                 return false;
             } else { //add vote if not yet vote 
-                pollLinkedList.get(curVotingPollIndex).getVotedList();
+                pollLinkedList.getEntry(curVotingPollIndex).getVotedList();
 
                 //need increase vote number of voteCount in pollStatus
 
@@ -186,28 +183,54 @@ public class VoterMenu {
         return false;
     }
     
+    public static void castVote(){
+        if(checkVoted()){ //if voter already voted on specified poll
+            System.out.println("Voter " + curVoter.getVoterID() + " has already voted!");      
+       
+        } else { //add vote if not yet vote 
+            voteCastableVotee();
+        }     
+            
+    }    
+     
     public static void voteCastableVotee(){
-        Poll curVotingPoll = pollLinkedList.get(curVotingPollIndex);
+        Poll curVotingPoll = pollLinkedList.getEntry(curVotingPollIndex);
         
         ListInterface<Votee> voteeList = curVotingPoll.getVoteeList();
         
         System.out.println("Idol List");
-        System.out.println("================");
-        for(int i = 0 ; i < voteeList.size(); i++){
-            System.out.println((i+1) + ") " + voteeList.get(i).getName());
+        System.out.println("=============================");
+        for(int i = 1 ; i < voteeList.getNumberOfEntries(); i++){
+            System.out.println((i) + ") " + voteeList.getEntry(i).getName());
         }
 
-        System.out.printf("Cast your vote(1-" + voteeList.size()+ "): ");
+        System.out.printf("Cast your vote(1-" + voteeList.getNumberOfEntries()+ "): ");
         int idolChoice = sc.nextInt();
         sc.nextLine();
         
         //add vote number to Poll
-        curVotingPoll.addVote(voteeList.get(idolChoice - 1));
+        curVotingPoll.addVote(voteeList.getEntry(idolChoice));
         
         //add voter record into votedList(from Poll class)
-        curVotingPoll.addVoter(voteeList.get(idolChoice - 1), curVoter);
+        curVotingPoll.addVoter(voteeList.getEntry(idolChoice), curVoter);
                 
-        System.out.println("You has successfully voted for " + voteeList.get(idolChoice - 1).getName() + ".");       
+        System.out.println("You has successfully voted for " + voteeList.getEntry(idolChoice).getName() + ".");       
             
+    }
+    
+    public static void deleteVoterSelf(){
+        System.out.println("===========Account Delete Confirmation===========");
+        System.out.println("|| Once you delete your account, you won't     ||");
+        System.out.println("|| be able to view or vote for the idol.       ||");
+        System.out.println("|| ____________________________________________||");
+        System.out.println("|| Are you sure to delete? (\"Y\" to confirm: ");
+        char deleteAccChoice  = sc.next().charAt(1);
+        
+        if(deleteAccChoice == 'Y' || deleteAccChoice == 'y'){
+            System.out.println("Voter " + voterLinkedList.getEntry(curVoterIndex).getVoteeName() 
+                    + "(ID: " + voterLinkedList.getEntry(curVoterIndex).getVoterID() + ") has successfully deleted.");
+            voterLinkedList.remove(curVoterIndex); 
+        }
+        System.out.println("\nBack to menu....");
     }
 }
