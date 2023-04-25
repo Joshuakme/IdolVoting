@@ -7,6 +7,7 @@ import adt.HashMap;
 import adt.MapInterface;
 import adt.LinkedList;
 import adt.ListInterface;
+import adt.SortedList;
 import java.util.Scanner;
 
 /**
@@ -127,7 +128,8 @@ public class AdminMenu {
                             Votee newVotee = new Votee(newVoteeDetailArr[0], newVoteeDetailArr[1]);
 
                             // Create New Votee
-                            admin.createVotee(newVotee);
+                            pollLinkedList.get(curVotingPollIndex).addVotee(newVotee);
+                            //admin.createVotee(newVotee);
                             
                             // break loop
                             validCreateVoteeInput = true;
@@ -150,7 +152,7 @@ public class AdminMenu {
                         String updateVoteeName = sc.nextLine();
 
                         // Get list of votee that matched the name of the entered name
-                        ListInterface<Votee> searchedVoteeList = admin.searchVotee(updateVoteeName);
+                        ListInterface<Votee> searchedVoteeList = pollLinkedList.get(curVotingPollIndex).searchVotee(updateVoteeName);
                         
                         // If search result is not null
                         if(searchedVoteeList != null) {
@@ -191,7 +193,8 @@ public class AdminMenu {
                                             Votee updatedVotee = new Votee(updatedVoteeDetailArr[0],updatedVoteeDetailArr[1]);
 
                                             // Update the selected Votee detail
-                                            admin.updateVotee(updatedVotee);
+                                            pollLinkedList.get(curVotingPollIndex).updateVotee(searchedVoteeList.get(selectedVoteeIndex), updatedVotee);
+                                            //admin.updateVotee(updatedVotee);
 
                                             // break loop
                                             // Set all flags to true
@@ -230,14 +233,13 @@ public class AdminMenu {
                         String deleteVoteeName = sc.nextLine();
                         
                         // Get list of votee that matched the name of the entered name
-                        ListInterface<Votee> searchedVoteeList = admin.searchVotee(deleteVoteeName);
-                        
+                        ListInterface<Votee> searchedVoteeList = pollLinkedList.get(curVotingPollIndex).searchVotee(deleteVoteeName);
                         
                         // If search result is not null
                         if(searchedVoteeList != null) {
-                            boolean validConfirmDeleteVoteeInput = false;
+                            boolean validSelectedVoteeIndex = false;
                             
-                            while(!validConfirmDeleteVoteeInput) {    
+                            while(!validSelectedVoteeIndex) {    
                                 // Display the list of matchced votee
                                 System.out.println("\nBelow is the list of Votee that matched the entered name:");
                                 System.out.printf("%4s %-8s %-10s %-20s","No.", "Votee ID", "Votee Name", "Votee Desc");
@@ -253,29 +255,33 @@ public class AdminMenu {
 
                                 // Check if valid selectedVoteeIndex
                                 if(selectedVoteeIndex > 0 && selectedVoteeIndex < searchedVoteeList.size()) {
-                                    // Print selected Votee detail
-                                    System.out.println("Below is the detail of the selected Votee: ");
-                                    System.out.println("Votee ID: " + searchedVoteeList.get(selectedVoteeIndex).getId() + "\n" +
-                                                        "Votee Name: " + searchedVoteeList.get(selectedVoteeIndex).getName() + "\n" +
-                                                        "Votee Description: " + searchedVoteeList.get(selectedVoteeIndex).getDescription() + "\n");
+                                    boolean validConfirmDeleteVoteeInput = false;
+                                    
+                                    while(!validConfirmDeleteVoteeInput) {
+                                        // Print selected Votee detail
+                                        System.out.println("Below is the detail of the selected Votee: ");
+                                        System.out.println("Votee ID: " + searchedVoteeList.get(selectedVoteeIndex).getId() + "\n" +
+                                                            "Votee Name: " + searchedVoteeList.get(selectedVoteeIndex).getName() + "\n" +
+                                                            "Votee Description: " + searchedVoteeList.get(selectedVoteeIndex).getDescription() + "\n");
 
-                                    // Get confirmation from the admin
-                                    System.out.println("Do you confirm to delete the Votee? (Y/N/0) ");
-                                    char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
+                                        // Get confirmation from the admin
+                                        System.out.println("Do you confirm to delete the Votee? (Y/N/0) ");
+                                        char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
 
-                                    if(deleteVoteeConfirmation == 'Y') {
-                                        admin.deleteVotee(searchedVoteeList.get(selectedVoteeIndex).getId());
-                                        
-                                        // Set all flags to true
-                                        validConfirmDeleteVoteeInput = true;
-                                        validDeleteVoteeInput = true;
-                                    } else if(deleteVoteeConfirmation == 'N' || deleteVoteeConfirmation == 0) {
-                                        validConfirmDeleteVoteeInput = true;
-                                    } else {
-                                        System.err.println("Please enter a Y-Yes, N-No, 0-Return to last step");
-                                        validDeleteVoteeInput = true;
+                                        if(deleteVoteeConfirmation == 'Y') {
+                                            pollLinkedList.get(curVotingPollIndex).removeVotee(searchedVoteeList.get(selectedVoteeIndex));
+                                            //admin.deleteVotee(searchedVoteeList.get(selectedVoteeIndex).getId());
+
+                                            // Set all flags to true
+                                            validConfirmDeleteVoteeInput = true;    // Current Level
+                                            validSelectedVoteeIndex = true;         // Upper Level
+                                            validDeleteVoteeInput = true;           // Outmost Level
+                                        } else if(deleteVoteeConfirmation == 'N' || deleteVoteeConfirmation == 0) {
+                                            validSelectedVoteeIndex = true;
+                                        } else {
+                                            System.err.println("Please enter a Y-Yes, N-No, 0-Return to last step");
+                                        }
                                     }
-
                                 } else {
                                     // If invalid selectedVoteeIndex
 
@@ -300,10 +306,66 @@ public class AdminMenu {
                     System.out.print("Enter the poll title: ");
                     String pollName = sc.nextLine(); 
                     
-                    admin.startPoll(pollName);;
+                    // Add new Poll object into pollList
+                    pollLinkedList.add(new Poll(pollName));
+                    
+                    // Update the current Voting Poll Index to the latest poll
+                    curVotingPollIndex = pollLinkedList.size()-1;
                     break;
                 case 2:
                     // End Poll
+                    boolean validEndPollInput = false;
+                    
+                    // Get list of available polls
+                    SortedList<Poll> availablePollList = new SortedList<>();
+
+                    for(int i=0; i<pollLinkedList.size(); i++) {
+                        if(pollLinkedList.get(i).isOpen()) {
+                            availablePollList.add(pollLinkedList.get(i));
+                        }
+                    }
+                        
+                    while(!validEndPollInput) {
+                        // Display the list of available polls
+                        System.out.println("\nBelow is the list of available Polls: ");
+                        System.out.printf("%4s %-20s","No.", "Poll Name");
+                        for(int i=0; i<availablePollList.size(); i++) {
+                            System.out.printf("%4s %-20s", (i+1) + ". ", availablePollList.get(i).getName());
+                        }
+                        System.out.println("\n");
+                        
+                        // Get confirmed Votee
+                        System.out.print("Please select the Poll you would like to end: ");
+                        int endPollInput = sc.nextInt();
+                        sc.nextLine();
+                        
+                        // Check if valid endPollInput
+                        if(endPollInput > 0 && endPollInput < availablePollList.size()) {
+                            boolean validConfirmEndPollInput = false;
+                            
+                            while(!validConfirmEndPollInput) {
+                                // Get confirmation from the admin
+                                System.out.println("Do you confirm to end this Poll? (Y/N/0) ");
+                                char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
+
+                                if(deleteVoteeConfirmation == 'Y') {
+                                    pollLinkedList.get(curVotingPollIndex).end();
+
+                                    // Set all flags to true
+                                    validConfirmEndPollInput = true;            // Current Level
+                                    validEndPollInput = true;                   // Outmost Level
+                                } else if(deleteVoteeConfirmation == 'N' || deleteVoteeConfirmation == 0) {
+                                    validConfirmEndPollInput = true;
+                                } else {
+                                    System.err.println("Please enter a Y-Yes, N-No, 0-Return to last step");
+                                }
+                            }
+                        } else {
+                            // If invalid endPollInput
+
+                            System.err.println("\nPlease enter a number that is in the range of (1 - " + availablePollList.size() + "). Please try again\n");
+                        } 
+                    }
                     break;
                 case 3:
                     // View Poll Status
