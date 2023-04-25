@@ -2,8 +2,11 @@ package client;
 
 import entity.Admin;
 import entity.Votee;
+import entity.Poll;
 import adt.HashMap;
 import adt.MapInterface;
+import adt.LinkedList;
+import adt.ListInterface;
 import java.util.Scanner;
 
 /**
@@ -11,9 +14,15 @@ import java.util.Scanner;
  * @author Joshua Koh Min En
  */
 public class AdminMenu {
-    // Global Variables
+    // Global util
     private static Scanner sc = new Scanner(System.in);
+    // Global Variables
+    private static LinkedList<Poll> pollLinkedList  = new LinkedList<>();
+    private static int curVotingPollIndex;
+    
+    // Global Status
     private static boolean isLogged = false;
+    // Global User
     private static Admin admin;
     
     public static void main(String[] args) {
@@ -39,7 +48,7 @@ public class AdminMenu {
             
             System.out.print("Please select choice (1 - " + MENU_ITEM_ARR.length + "): ");
             int choiceAdmin = sc.nextInt();
-            sc.next();
+            sc.nextLine();
             
             switch (choiceAdmin) {
                 case 1:
@@ -52,6 +61,7 @@ public class AdminMenu {
                         // Get level 2 choice
                         System.out.print("Please select choice (1 - " + MENU_ITEM_ARR.length + "): ");
                         int choiceAdmin2 = sc.nextInt();
+                        sc.nextLine();
 
                         adminActionLev2(choiceAdmin,choiceAdmin2);
                         break;
@@ -68,25 +78,6 @@ public class AdminMenu {
                 default:
                     break;
             }
-            
-            
-            Votee votee1 = new Votee("V001", "Ariana Grande", "A popular American singer and songwriter.");
-            Votee votee2 = new Votee("V002", "Justin Bieber", "A Canadian singer, songwriter, and multi-instrumentalist.");
-            
-            
-            MapInterface<String, Votee> voteeMap = new HashMap<>();
-            voteeMap.put(votee1.getId(), votee1);
-            voteeMap.put(votee2.getId(), votee2);
-            
-            // Update the description of votee1
-            votee1.setDescription("An award-winning singer with a powerful voice.");
-
-            // Update the entry in the HashMap
-            voteeMap.put(votee1.getId(), votee1);
-
-            // Delete votee2 from the HashMap
-            voteeMap.remove(votee2.getId());
-
         }
     }
     
@@ -105,10 +96,12 @@ public class AdminMenu {
     
     public static void adminMenuLev2(String[][] menuItemArr, int choice) {    
         choice = choice - 1;
-     
+        
+        System.out.println("\n");
         for(int i=1; i<menuItemArr[choice].length; i++) {
-            System.out.println((i+1) + ". " + menuItemArr[choice][i]);
+            System.out.println((i) + ". " + menuItemArr[choice][i]);
         }
+        System.out.print("\n");
     }
     
     public static void adminActionLev2(int choiceAdminLevel1,int choiceAdminLevel2) {
@@ -117,24 +110,105 @@ public class AdminMenu {
             switch(choiceAdminLevel2) {
                 case 1:
                     // Create Votee Function
+                    boolean validCreateVoteeInput = false;
                     
-                    // - Get new Votee details
-                    System.out.println("Please enter the details of the new votee in the format(ID, Name, Description)");
-                    System.out.println("Example: V001, Joshua Koh, A popular Malaysian singer and songwriter.");
-                    System.out.print("New Votee Details: ");
-                    String newVoteeDetails = sc.nextLine();
-                    
-                    // Split string by character ","
-                    String[] newVoteeDetaiLArr = newVoteeDetails.split(",");
-                    
-                    // Assign new Votee detail
-                    Votee newVotee = new Votee(newVoteeDetaiLArr[0], newVoteeDetaiLArr[1], newVoteeDetaiLArr[2]);
-                    
-                    // Create New Votee
-                    admin.createVotee(newVotee);
+                    while(!validCreateVoteeInput) {
+                            // - Get new Votee details
+                        System.out.println("Please enter the details of the new votee in the format(Name, Description)");
+                        System.out.println("Example: Joshua Koh, A popular Malaysian singer and songwriter.");
+                        System.out.print("New Votee Details: ");
+                        String newVoteeDetails = sc.nextLine();
+
+                        // Split string by character ","
+                        String[] newVoteeDetailArr = newVoteeDetails.split(", ");
+
+                        if(newVoteeDetailArr.length == 2) {
+                            // Assign new Votee detail
+                            Votee newVotee = new Votee(newVoteeDetailArr[0], newVoteeDetailArr[1]);
+
+                            // Create New Votee
+                            admin.createVotee(newVotee);
+                            
+                            // break loop
+                            validCreateVoteeInput = true;
+                            
+                            // Successful Message
+                            System.out.println("New Votee (" + newVotee.getName()+ ") created successfully!!");
+                        } else if (newVoteeDetailArr.length < 2) {
+                            System.err.println("\nYou have entered too few information. Please try again!\n");
+                        } else {
+                            System.err.println("\nYou have entered too much information. Please try again!\n");
+                        }  
+                    }
                     break;
                 case 2:
-                    // Update Votee
+                    // Update Votee Information
+                    boolean validUpdateVoteeInput = false;
+                    
+                    while(!validUpdateVoteeInput) {
+                        System.out.print("Please enter the Votee Name you would like to update: ");
+                        String updateVoteeName = sc.nextLine();
+
+                        // Get list of votee that matched the name of the entered name
+                        ListInterface<Votee> searchedVoteeList = admin.searchVotee(updateVoteeName);
+                        
+                        // If search result is not null
+                        if(searchedVoteeList != null) {
+                            // Display the list of matchced votee
+                            System.out.println("\nBelow is the list of Votee that matched the entered name:");
+                            System.out.printf("%4s %-8s %-10s %-20s","No.", "Votee ID", "Votee Name", "Votee Desc");
+                            for(int i=0; i<searchedVoteeList.size(); i++) {
+                                System.out.printf("%4s %-8s %-10s %-20s", (i+1) + ". ", searchedVoteeList.get(i).getId(), searchedVoteeList.get(i).getName(), searchedVoteeList.get(i).getDescription());
+                            }
+
+                            // Get confirmed Votee
+                            System.out.print("Please select the Votee you would like to update: ");
+                            int selectedVoteeIndex = sc.nextInt();
+                            sc.nextLine();
+
+                            // Check if valid selectedVoteeIndex
+                            if(selectedVoteeIndex > 0 && selectedVoteeIndex < searchedVoteeList.size()) {
+                                // Get updated detail of the selected Votee
+                                System.out.println("Please enter the updated detail: ");
+
+                                System.out.println("Old: " + searchedVoteeList.get(selectedVoteeIndex).getId() + ", " + searchedVoteeList.get(selectedVoteeIndex).getName() + ", " +
+                                                    searchedVoteeList.get(selectedVoteeIndex).getDescription());
+                                System.out.print("New: " + searchedVoteeList.get(selectedVoteeIndex).getId() + ", ");
+
+                                String updatedVoteeDetails = sc.nextLine();
+
+                                // Split string by character ","
+                                String[] updatedVoteeDetailArr = updatedVoteeDetails.split(", ");
+
+                                // Check if the input is valid (exactly 2 parameter)
+                                if(updatedVoteeDetailArr.length == 2) {
+                                    Votee updatedVotee = new Votee(updatedVoteeDetailArr[0],updatedVoteeDetailArr[1]);
+                                    
+                                    // Update the selected Votee detail
+                                    admin.updateVotee(updatedVotee);
+                                    
+                                    // break loop
+                                    validUpdateVoteeInput = true;
+
+                                    // Successful Message
+                                    System.out.println("Updated Votee (" + updatedVotee.getName()+ ") updated successfully!!");
+                                }
+                                else if (updatedVoteeDetailArr.length < 2) {
+                                    System.err.println("\nYou have entered too few information. Please try again!\n");
+                                } else {
+                                    System.err.println("\nYou have entered too much information. Please try again!\n");
+                                }  
+                            } else {
+                                // If invalid selectedVoteeIndex
+                                
+                                System.err.println("\nPlease enter a number that is in the range of (1 - " + searchedVoteeList.size() + "). Please try again\n");
+                            }
+                        } else {
+                            // If search result is null
+                            
+                            System.err.println("\nThere is no Votee in the list that matched the entered name. Please try again\n");
+                        }
+                    }       
                     break;
                 case 3:
                     // Delete Votee

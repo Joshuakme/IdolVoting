@@ -10,6 +10,7 @@ import entity.Admin;
 import entity.Poll;
 import entity.Votee;
 import entity.Voter;
+import entity.User;
 // Import Util
 import java.util.Scanner;
 import java.util.InputMismatchException;
@@ -23,7 +24,11 @@ import java.util.InputMismatchException;
 public class IdolVoting { 
     // Global Variables
     private static Scanner sc = new Scanner(System.in);
+    
+    
     private static boolean isLogged = false;
+    private static User currentUser;
+    
     private static Admin admin;
     
     public static void main(String[] args) {
@@ -119,4 +124,5 @@ public class IdolVoting {
     // Operation Methods
     
     // Utils Methods
+
 }
