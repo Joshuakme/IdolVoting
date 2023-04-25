@@ -2,6 +2,7 @@ package client;
 
 // Import ADT
 import adt.HashMap;
+import adt.LinkedList;
 import adt.MapInterface;
 import adt.SortedList;
 import adt.SortedListInterface;
@@ -22,8 +23,12 @@ import java.util.InputMismatchException;
  * @author Shia Chai Fen
  */
 public class IdolVoting { 
-    // Global Variables
+    // Global util
     private static Scanner sc = new Scanner(System.in);
+    // Global Variables
+    private static LinkedList<Poll> pollLinkedList  = new LinkedList<>();
+    private static int curVotingPollIndex;
+    
     
     
     private static boolean isLogged = false;

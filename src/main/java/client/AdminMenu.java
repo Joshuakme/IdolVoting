@@ -3,8 +3,6 @@ package client;
 import entity.Admin;
 import entity.Votee;
 import entity.Poll;
-import adt.HashMap;
-import adt.MapInterface;
 import adt.LinkedList;
 import adt.ListInterface;
 import adt.SortedList;
