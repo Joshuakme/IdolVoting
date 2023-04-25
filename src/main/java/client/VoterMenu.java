@@ -30,62 +30,91 @@ public class VoterMenu {
         
         //Menu
         //default Value
-        int choice = 1;
-        boolean loginExist = false;
+        int choice;
         
             do{
-                System.out.printf("================== VOTER MENU =================\n");
-                System.out.printf("|| 1.Register Voter\n");
-                System.out.printf("|| 2.Login Voter\n");
-                System.out.printf("|| 3.Cast Vote\n");
-                System.out.printf("|| 4.View total number of voters participated\n");
-                System.out.printf("|| 5.Delete Account\n");
-                System.out.printf("|| 6.Back to Main Menu\n");
-                System.out.printf("===============================================\n");   
-                System.out.printf("==>Enter your choice(1-4): ");
+                System.out.println("================== VOTER MENU =================");
+                System.out.println("|| 1.Register Voter");
+                System.out.println("|| 2.Login/Logout Voter");
+                System.out.println("|| 3.Cast Vote");
+                System.out.println("|| 4.View total number of voters participated");
+                System.out.println("|| 5.Modify Account Details");
+                System.out.println("|| 6.Delete Account");
+                System.out.println("|| 7.Back to Main Menu");
+                System.out.println("===============================================");   
+                System.out.printf("==>Enter your choice(1-7): ");
                 choice = sc.nextInt();
                 sc.nextLine();
                 
                 switch(choice){
                  case 1:
+                    //Register Voter
                     registerVoter();
                     break;
                     
                  case 2:
-                    loginVoter();
+                    //Login Voter
+                    loginVoter();    
                     break;
-                    
-                 case 3:
-                    //select Poll
-                    selectPoll();
 
-                    //cast Vote
-                    castVote();
+                 case 3:
+                    //Check if user logged in
+                    if(!isLogged){ 
+                        loginNotify();
+                    }else{
+                        //select Poll
+                        selectPoll();
+
+                        //cast Vote
+                        castVote();
+                    }
                     break;
                     
                  case 4:
-                    //View number of voters
-                    int numberOfVoter = voterLinkedList.getNumberOfEntries(); //Obtain total voter involved 
-                    System.out.println("The total number of voters currently is " + numberOfVoter + ".\n");
+                    if(!isLogged){ 
+                        loginNotify();
+                    }else{
+                        //View number of voters
+                        int numberOfVoter = voterLinkedList.getNumberOfEntries(); //Obtain total voter involved 
+                        System.out.println("The total number of voters currently is " + numberOfVoter + ".\n");
+                    }
                     break;
                     
                  case 5:
-                    // Remove a voter from the list
-                    deleteVoterSelf();
+                    if (!isLogged) {
+                        loginNotify();
+                    }else{
+                        // Modify voter's details from the list
+                        updateVoterMenu();
+                    }
+                    break;
+                
+                 case 6:
+                    if (!isLogged) {
+                        loginNotify();
+                    } else {
+                        // Remove a voter from the list
+                        deleteVoterSelf();
+                    }
                     break;
                     
+                 case 7:
+                    // Back to User Menu;
+                    break;
+
                  default:
+                    System.out.println("Invalid choice, try again.");
                 }
-            } while(choice != 5 && choice != 6);
+            } while(choice != 7);
             
-        System.out.println("Thank you for using idol voting application");   
+        System.out.println("Back to User Menu...");   
     }
     
     public static LinkedList<Voter> initVoter() {
         LinkedList<Voter> voterLinkedList = new LinkedList<>();
         
-        Voter voter1 = new Voter("V1002","Joshua", "joshua@gmail.com", "Joshhh", "123");
-        Voter voter2 = new Voter("V1003","User404", "user404@gmail.com", "Invalid", "404");
+        Voter voter1 = new Voter("V1001","Joshua", "joshua@gmail.com", "Joshhh", "123");
+        Voter voter2 = new Voter("V1002","User404", "user404@gmail.com", "Invalid", "404");
         
         voterLinkedList.add(voter1);
         voterLinkedList.add(voter2);  
@@ -95,16 +124,16 @@ public class VoterMenu {
     }
     
     public static void registerVoter(){
-        System.out.printf("\nUser Registration\n");
-        System.out.printf("Username: ");
+        System.out.println("\n=====User Registration=============");
+        System.out.printf("||Username: ");
         String tempUsername = sc.nextLine();
-        System.out.printf("Password: ");
+        System.out.printf("||Password: ");
         String tempPassword = sc.nextLine();
 
-        System.out.printf("\nFill in your User Detail");
-        System.out.printf("\nReal Name: ");
+        System.out.println("\n||Fill in your User Detail");
+        System.out.printf("||Real Name: ");
         String tempName = sc.nextLine();
-        System.out.printf("Email: ");
+        System.out.printf("||Email: ");
         String tempEmail = sc.nextLine();
 
 
@@ -115,7 +144,8 @@ public class VoterMenu {
     public static void loginVoter(){
         int loginTry = 0;
         //Check if user logged in
-        if(!isLogged){ //login only attempt less than 3 times
+        if(!isLogged){ 
+            //login only attempt less than 3 times
             while(!isLogged  && loginTry < 3){
                 System.out.printf("User Login\n");
                 System.out.printf("Username: ");
@@ -133,15 +163,29 @@ public class VoterMenu {
                     }
                 }
                 if(!isLogged){
-
                     System.out.printf("Login Failed, try again...\n");
                     loginTry++;   
                 }
    
             }
         }else{
-            System.out.println("Voter already login.");
+            //logout voter
+            logoutVoter();
         }
+        System.out.println("\nBack to menu....");
+        
+    }
+    
+    public static void logoutVoter(){
+        System.out.printf("Do you wish to logout? (\"Y\" to log out): ");
+        char logoutAccChoice = sc.next().charAt(1);
+
+        if(logoutAccChoice == 'Y' || logoutAccChoice == 'y'){
+            System.out.println("Voter " + voterLinkedList.getEntry(curVoterIndex).getVoterName() 
+                    + "(ID: " + voterLinkedList.getEntry(curVoterIndex).getVoterID() + ") has successfully logout.");
+            isLogged = false;
+            curVoterIndex = 0;
+        } 
     }
     
     public static void selectPoll(){
@@ -218,19 +262,88 @@ public class VoterMenu {
             
     }
     
+    public static void updateVoterMenu(){
+        int updateChoice;
+        do{
+            System.out.println("=======Update Voter Info==================");
+            System.out.println("|| 1) Username");
+            System.out.println("|| 2) Email");
+            System.out.println("|| 3) Password");
+            System.out.println("|| 4) Back to menu");
+            System.out.println("==========================================");
+            updateChoice = sc.nextInt();
+            sc.nextLine();
+
+            switch(updateChoice) {
+                case 1: case 2: case 3:
+                    updateVoter(updateChoice);
+                    break;
+                    
+                case 4:
+                    System.out.println("Back to Menu...");
+                    break;
+                    
+                default:
+                    System.out.println("Invalid choice, try again.");
+            }
+        }while(updateChoice != 4);  
+    }
+    
+    public static void updateVoter(int updateOption){    
+        //declare temporary info
+        String tempUpdatedUsername = curVoter.getUsername();
+        String tempUpdatedEmail = curVoter.getEmail();
+        String tempUpdatedPassword = curVoter.getPassword();
+        
+        switch (updateOption) {
+            case 1:
+                System.out.printf("\nNew Username: ");
+                tempUpdatedUsername = sc.nextLine();
+                break;
+            case 2:
+                System.out.printf("\nNew Email: ");
+                tempUpdatedEmail = sc.nextLine();
+                break;
+            case 3:
+                System.out.printf("\nNew Password: ");
+                tempUpdatedPassword = sc.nextLine();
+                break;
+            default:
+                break;
+        }
+        
+        Voter tempUpdatedVoter = new Voter(curVoter.getVoterID(),curVoter.getVoterName(), tempUpdatedEmail, tempUpdatedUsername, tempUpdatedPassword);
+        
+        //Replace new info into existed Voter
+        voterLinkedList.replace(curVoterIndex, tempUpdatedVoter);
+        
+        //Set updated Voter as logged user
+        curVoter = voterLinkedList.getEntry(curVoterIndex);
+        
+    }
+    
     public static void deleteVoterSelf(){
         System.out.println("===========Account Delete Confirmation===========");
         System.out.println("|| Once you delete your account, you won't     ||");
         System.out.println("|| be able to view or vote for the idol.       ||");
         System.out.println("|| ____________________________________________||");
-        System.out.println("|| Are you sure to delete? (\"Y\" to confirm: ");
-        char deleteAccChoice  = sc.next().charAt(1);
+        System.out.printf("|| Are you sure to delete? (\"Y\" to confirm): ");
+        char deleteAccChoice = sc.next().charAt(1);
         
         if(deleteAccChoice == 'Y' || deleteAccChoice == 'y'){
-            System.out.println("Voter " + voterLinkedList.getEntry(curVoterIndex).getVoteeName() 
+            System.out.println("Voter " + voterLinkedList.getEntry(curVoterIndex).getVoterName() 
                     + "(ID: " + voterLinkedList.getEntry(curVoterIndex).getVoterID() + ") has successfully deleted.");
             voterLinkedList.remove(curVoterIndex); 
+            isLogged = false; //Logout user
+            curVoterIndex = 0; 
+            
         }
         System.out.println("\nBack to menu....");
+    }
+    
+    public static void loginNotify(){
+        System.out.println("===LOGIN REQUIRED================");
+        System.out.println("| Please proceed to login first |");
+        System.out.println("=================================");
     }
 }
