@@ -16,5 +16,4 @@ public interface ListInterface<T> {
     public boolean contains(T anEntry);
     public int size();
     public boolean isEmpty();
-    public boolean isFull();
 }
