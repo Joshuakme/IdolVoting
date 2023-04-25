@@ -81,7 +81,7 @@ public class LinkedList<T> implements ListInterface<T> {
                 }
                 result = nodeBefore.next.data;  // save entry to be removed
                 nodeBefore.next = nodeBefore.next.next;	// make node before point to node after the
-            } 
+            } 																// one to be deleted (to disconnect node from chain)
 
             numberOfEntries--;
         }
@@ -154,6 +154,21 @@ public class LinkedList<T> implements ListInterface<T> {
             currentNode = currentNode.next;
         }
         return outputStr;
+    }
+
+    @Override
+    public T get(int index) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public T set(int index, T element) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public int size() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     private class Node {
