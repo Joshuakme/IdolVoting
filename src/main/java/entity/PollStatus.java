@@ -13,7 +13,7 @@ public class PollStatus {
     
     public PollStatus() {
         this.voteCount = new HashMap<>();
-        this.timeRemaining = 0;
+        this.timeRemaining = 10000;
     }
     
     public MapInterface<Votee, Integer> getVoteCount() {

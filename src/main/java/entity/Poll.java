@@ -1,5 +1,6 @@
 package entity;
 
+import adt.ArrayList;
 import adt.HashMap;
 import adt.ListInterface;
 import adt.MapInterface;
@@ -16,6 +17,22 @@ public class Poll implements Comparable<Poll> {
     private boolean isOpen;
     
     // Constructor
+    public Poll(String name) {
+        this.name = name;
+        this.voteeList = new ArrayList<>();
+        this.pollStatus = new PollStatus();
+        
+        for(int i=0; i<voteeList.size(); i++) {
+            MapInterface<Votee, Integer> voteCount = new HashMap<>();
+            
+            // Initialize the voteCount map 
+            voteCount.put(voteeList.get(i), 0);
+            
+            pollStatus.setVoteCount(voteCount);
+        }
+        this.isOpen = false;
+    }
+    
     public Poll(String name, ListInterface<Votee> voteeList) {
         this.name = name;
         this.voteeList = voteeList;
@@ -62,9 +79,46 @@ public class Poll implements Comparable<Poll> {
     public void setPollStatus(PollStatus pollStatus) {
         this.pollStatus = pollStatus;
     }
+    
+    
+    // Votee CRUD
+    public void addVotee(Votee votee) {
+        pollStatus.getVoteCount().put(votee, 0);
+    }
+    
+    public void updateVotee(Votee oldVotee, Votee newVotee) {
+        MapInterface<Votee, Integer> updatedMap = new HashMap<>();
+        
+        for (MapInterface.Entry<Votee, Integer> entry : pollStatus.getVoteCount().entrySet()) {
+            if (entry.getKey().equals(oldVotee)) {
+                // Copy the old value and replace by new key
+                updatedMap.put(newVotee, entry.getValue());
+            } else {
+                updatedMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+        
+        pollStatus.setVoteCount(updatedMap);
+    }
+    
+    public void removeVotee(Votee votee) {
+        pollStatus.getVoteCount().remove(votee);
+    }
+    
+    public ListInterface<Votee> searchVotee(String voteeName) {
+        if (voteeName == null || voteeName.isEmpty()) {
+            return null;
+        }
+        
+        ListInterface<Votee> matchedVoteeList = new ArrayList<>();
 
-    public void setIsOpen(boolean isOpen) {
-        this.isOpen = isOpen;
+        for (MapInterface.Entry<Votee, Integer> pairEntry : pollStatus.getVoteCount().entrySet()) {
+            if (pairEntry.getKey().getName().toUpperCase().contains(voteeName.toUpperCase())) {
+                matchedVoteeList.add(pairEntry.getKey());
+            }
+        }
+
+        return matchedVoteeList;
     }
     
     
