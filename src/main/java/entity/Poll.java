@@ -1,26 +1,32 @@
 package entity;
 
-import adt.ArrayList;
 import adt.HashMap;
 import adt.ListInterface;
+import adt.SortedListInterface;
 import adt.MapInterface;
+import adt.ArrayList;
 
 /**
  *
- * @author Joshua Koh
+ * @author Shia Chai Fen
+ * @author Joshua Koh Min En
+ * @author Lai Chee Sheng
  */
-public class Poll implements Comparable<Poll> {
+
+public class Poll implements Comparable <Poll> {
     // Data Attribute
     private String name;
-    private ListInterface<Votee> voteeList;
     private PollStatus pollStatus;
+    private MapInterface<Votee, SortedListInterface<Voter>> votedList; //Add new
     private boolean isOpen;
     
-    // Constructor
-    public Poll(String name) {
-        this.name = name;
-        this.voteeList = new ArrayList<>();
-        this.pollStatus = new PollStatus();
+    // Constructor    
+     public Poll(String name) {
+         this(name, new PollStatus(), new HashMap<>(),false);
+    }
+     
+    public Poll(String name, SortedListInterface<Votee> voteeList) {
+        this(name,new PollStatus(),new HashMap<>(),false);
         
         for(int i=0; i<voteeList.size(); i++) {
             MapInterface<Votee, Integer> voteCount = new HashMap<>();
@@ -30,35 +36,22 @@ public class Poll implements Comparable<Poll> {
             
             pollStatus.setVoteCount(voteCount);
         }
-        this.isOpen = false;
     }
-    
-    public Poll(String name, ListInterface<Votee> voteeList) {
+
+    public Poll(String name, PollStatus pollStatus, MapInterface<Votee, SortedListInterface<Voter>> votedList, boolean isOpen) {
         this.name = name;
-        this.voteeList = voteeList;
-        this.pollStatus = new PollStatus();
-        
-        for(int i=0; i<voteeList.size(); i++) {
-            MapInterface<Votee, Integer> voteCount = new HashMap<>();
-            
-            // Initialize the voteCount map 
-            voteCount.put(voteeList.get(i), 0);
-            
-            pollStatus.setVoteCount(voteCount);
-        }
-        this.isOpen = false;
+        this.pollStatus = pollStatus;
+        this.votedList = votedList;
+        this.isOpen = isOpen;
     }
+
     
     // Getter
     public String getName() {
         return name;
     }
 
-    public ListInterface<Votee> getVoteeList() {
-        return voteeList;
-    }
-
-    public PollStatus getStatus() {
+    public PollStatus getPollStatus() {
         return pollStatus;
     }
 
@@ -66,21 +59,52 @@ public class Poll implements Comparable<Poll> {
         return isOpen;
     }
     
+    public MapInterface<Votee, SortedListInterface<Voter>> getVotedList() {
+        return votedList;
+    }
     
+
     // Setter
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setVoteeList(ListInterface<Votee> voteeList) {
-        this.voteeList = voteeList;
-    }
-
     public void setPollStatus(PollStatus pollStatus) {
         this.pollStatus = pollStatus;
     }
+
+    public void open() {
+        this.isOpen = true;
+    }
     
+    public void end() {
+        this.isOpen = false;
+    }
+
+    public void setVotedList(MapInterface<Votee, SortedListInterface<Voter>> votedList) {
+        this.votedList = votedList;
+    }
     
+
+
+    // Operation Methods
+    public void addVote(Votee votee) {
+        MapInterface<Votee, Integer> newVote = new HashMap<>();
+        
+        if (isOpen) {
+            pollStatus.getVoteCount().put(votee, pollStatus.getVoteCount().get(votee) + 1);
+            
+            //pollStatus.setVoteCount(newVote);
+        } else {
+            throw new IllegalStateException("Poll is closed.");
+        }
+    }
+   
+    public void addVoter(Votee votee, Voter voter){
+        votedList.get(votee).add(voter);
+    }
+    
+
     // Votee CRUD
     public void addVotee(Votee votee) {
         pollStatus.getVoteCount().put(votee, 0);
@@ -121,24 +145,72 @@ public class Poll implements Comparable<Poll> {
         return matchedVoteeList;
     }
     
-    
-    // Operation Methods
-    public void addVote(Votee votee) {
-        MapInterface<Votee, Integer> newVote = new HashMap<>();
-        
-        if (isOpen) {
-            newVote.put(votee, pollStatus.getVoteCount().get(votee) + 1);
-            
-            pollStatus.setVoteCount(newVote);
-        } else {
-            throw new IllegalStateException("Poll is closed.");
+ 
+    //Ranking Methods
+    public ArrayList<Votee> defaultRanking() {
+       MapInterface<Votee, Integer> voteCountMap = pollStatus.getVoteCount();
+       ArrayList<Votee> voteeArrList = new ArrayList<>(voteCountMap.size());
+       
+        for (MapInterface.Entry<Votee, Integer> entry : voteCountMap.entrySet()) {
+            voteeArrList.add(entry.getKey());
         }
-    }
-     
-    public void end() {
-        this.isOpen = false;
+        return voteeArrList;
     }
 
+    public ArrayList<Votee> ascRanking(){
+        MapInterface<Votee, Integer> voteCountMap = pollStatus.getVoteCount();
+        ArrayList<Votee> voteeArrList = new ArrayList<>(voteCountMap.size());
+        ArrayList<Integer> voteCountArrList = new ArrayList<>(voteCountMap.size());
+       
+        
+        for (MapInterface.Entry<Votee, Integer> entry : voteCountMap.entrySet()) {
+             voteeArrList.add(entry.getKey());
+             voteCountArrList.add(entry.getValue());
+        }
+
+        for(int i = 1; i<voteCountArrList.size(); i++){
+            Votee tempVotee = voteeArrList.get(i);
+            int temp = voteCountArrList.get(i);
+            int j = i-1;            //j is the position
+            
+            while(j>=0 && voteCountArrList.get(j)> temp){
+                 voteeArrList.set(j+1, voteeArrList.get(j));
+                 voteCountArrList.set(j+1, voteCountArrList.get(j));
+                 j--;
+            }
+             voteeArrList.set(j+1, tempVotee);
+             voteCountArrList.set(j+1, temp);
+        }
+        return voteeArrList;
+    }  
+      
+    public ArrayList<Votee> descRanking(){
+        MapInterface<Votee, Integer> voteCountMap = pollStatus.getVoteCount();
+        ArrayList<Votee> voteeArrList = new ArrayList<>(voteCountMap.size());
+        ArrayList<Integer> voteCountArrList = new ArrayList<>(voteCountMap.size());
+        
+        for (MapInterface.Entry<Votee, Integer> entry : voteCountMap.entrySet()) {
+             voteeArrList.add(entry.getKey());
+             voteCountArrList.add(entry.getValue());
+        }
+
+        
+        for(int i = 1; i<voteCountArrList.size(); i++){
+            Votee tempVotee = voteeArrList.get(i);
+            int temp = voteCountArrList.get(i);
+            int j = i-1;            //j is the position
+            
+            while(j>=0 && voteCountArrList.get(j)< temp){
+                 voteeArrList.set(j+1, voteeArrList.get(j));
+                 voteCountArrList.set(j+1, voteCountArrList.get(j));
+                 j--;
+            }
+             voteeArrList.set(j+1, tempVotee);
+             voteCountArrList.set(j+1, temp);
+        }
+        return voteeArrList;
+    }   
+ 
     
     // Comparable Methods
     @Override
@@ -157,4 +229,3 @@ public class Poll implements Comparable<Poll> {
         return Integer.compare(otherTotalVotes, totalVotes);
     }
 }
-
