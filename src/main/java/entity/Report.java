@@ -5,12 +5,16 @@
  */
 package entity;
 
-import adt.InterfaceReport;
+
+import adt.ReportInterface;
+
 /**
  *
  * @author limky
  */
-public class Report <T extends Comparable<T>, Y> implements InterfaceReport<T, Y>{
+
+public class Report <T extends Comparable<T>, Y> implements ReportInterface<T, Y>{
+
     private T[] idolName;
     private Y[] idolTotalVotes;
     private int numberOfEntries;
@@ -153,3 +157,4 @@ public class Report <T extends Comparable<T>, Y> implements InterfaceReport<T, Y
         return outputStr;
     };
 }
+

@@ -4,17 +4,17 @@ package entity;
  *
  * @author Joshua Koh Min En
  */
-public class Votee {
+public class Votee implements Comparable <Votee> {
     private String id;
     private String name;
     private String description;
-    private int votes;
+    private int totalVotes;     // Include all votes from different poll
+    private static int previousCount = 0;
     
-    public Votee(String id, String name, String description) {
-        this.id = id;
+    public Votee(String name, String description) {
+        this.id = "V" + String.format("%03d", ++previousCount);
         this.name = name;
         this.description = description;
-        this.votes = 0;
     }
 
 
@@ -30,13 +30,9 @@ public class Votee {
     public String getDescription() {
         return description;
     }
-    
-    public int getVotes() {
-        return votes;
-    }
-    
-    public void setId(String id) {
-        this.id = id;
+
+    public int getTotalVotes() {
+        return totalVotes;
     }
 
     // Setter
@@ -44,15 +40,18 @@ public class Votee {
         this.name = name;
     }
 
-    public void setVotes(int votes) {
-        this.votes = votes;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public void setTotalVotes(int totalVotes) {
+        this.totalVotes = totalVotes;
+    }
     
-    public void addVote() {
-        votes++;
+    
+    // Abstract Methods
+    @Override
+    public int compareTo(Votee other) {  
+        return Integer.compare(this.totalVotes, other.totalVotes);
     }
 }

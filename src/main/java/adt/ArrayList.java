@@ -130,11 +130,6 @@ public class ArrayList<T> implements ListInterface<T>, Serializable {
     return numberOfEntries == 0;
   }
 
-  @Override
-  public boolean isFull() {
-    return false;
-  }
-
   private boolean isArrayFull(){
       return numberOfEntries == array.length;
   }

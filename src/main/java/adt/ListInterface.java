@@ -2,7 +2,7 @@ package adt;
 
 /**
  *
- * @author Joshua Koh Min En
+ * @author Lai Chee Sheng
  */
 public interface ListInterface<T> {
     public boolean add(T newEntry);
@@ -16,5 +16,4 @@ public interface ListInterface<T> {
     public boolean contains(T anEntry);
     public int size();
     public boolean isEmpty();
-    public boolean isFull();
 }
