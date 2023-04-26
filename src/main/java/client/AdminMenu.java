@@ -3,7 +3,6 @@ package client;
 import entity.Admin;
 import entity.Votee;
 import entity.Poll;
-import adt.LinkedList;
 import adt.ListInterface;
 import adt.SortedList;
 import java.util.Scanner;
@@ -15,9 +14,7 @@ import java.util.Scanner;
 public class AdminMenu {
     // Global util
     private static Scanner sc = new Scanner(System.in);
-    // Global Variables
-    private static LinkedList<Poll> pollLinkedList  = new LinkedList<>();
-    private static int curVotingPollIndex;
+    // Global Variables 
     
     // Global Status
     private static boolean isLogged = false;
@@ -150,8 +147,7 @@ public class AdminMenu {
                             Votee newVotee = new Votee(newVoteeDetailArr[0], newVoteeDetailArr[1]);
 
                             // Create New Votee
-                            pollLinkedList.get(curVotingPollIndex).addVotee(newVotee);
-                            //admin.createVotee(newVotee);
+                            IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).addVotee(newVotee);
                             
                             // break loop
                             validCreateVoteeInput = true;
@@ -174,7 +170,7 @@ public class AdminMenu {
                         String updateVoteeName = sc.nextLine();
 
                         // Get list of votee that matched the name of the entered name
-                        ListInterface<Votee> searchedVoteeList = pollLinkedList.get(curVotingPollIndex).searchVotee(updateVoteeName);
+                        ListInterface<Votee> searchedVoteeList = IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).searchVotee(updateVoteeName);
                         
                         // If search result is not null
                         if(searchedVoteeList != null) {
@@ -210,7 +206,7 @@ public class AdminMenu {
                                             Votee updatedVotee = new Votee(updatedVoteeDetailArr[0],updatedVoteeDetailArr[1]);
 
                                             // Update the selected Votee detail
-                                            pollLinkedList.get(curVotingPollIndex).updateVotee(searchedVoteeList.get(selectedVoteeIndex), updatedVotee);
+                                            IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).updateVotee(searchedVoteeList.get(selectedVoteeIndex), updatedVotee);
                                             //admin.updateVotee(updatedVotee);
 
                                             // break loop
@@ -250,7 +246,7 @@ public class AdminMenu {
                         String deleteVoteeName = sc.nextLine();
                         
                         // Get list of votee that matched the name of the entered name
-                        ListInterface<Votee> searchedVoteeList = pollLinkedList.get(curVotingPollIndex).searchVotee(deleteVoteeName);
+                        ListInterface<Votee> searchedVoteeList = IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).searchVotee(deleteVoteeName);
                         
                         // If search result is not null
                         if(searchedVoteeList != null) {
@@ -280,7 +276,7 @@ public class AdminMenu {
                                         char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
 
                                         if(deleteVoteeConfirmation == 'Y') {
-                                            pollLinkedList.get(curVotingPollIndex).removeVotee(searchedVoteeList.get(selectedVoteeIndex));
+                                            IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).removeVotee(searchedVoteeList.get(selectedVoteeIndex));
                                             //admin.deleteVotee(searchedVoteeList.get(selectedVoteeIndex).getId());
 
                                             // Set all flags to true
@@ -318,10 +314,10 @@ public class AdminMenu {
                     String pollName = sc.nextLine(); 
                     
                     // Add new Poll object into pollList
-                    pollLinkedList.add(new Poll(pollName));
+                    IdolVoting.getPollLinkedList().add(new Poll(pollName));
                     
                     // Update the current Voting Poll Index to the latest poll
-                    curVotingPollIndex = pollLinkedList.size()-1;
+                    IdolVoting.setCurVotingPollIndex(IdolVoting.getPollLinkedList().size()-1);
                     break;
                 case 2:
                     // End Poll
@@ -347,7 +343,7 @@ public class AdminMenu {
                                 char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
 
                                 if(deleteVoteeConfirmation == 'Y') {
-                                    pollLinkedList.get(curVotingPollIndex).end();
+                                    IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).end();
 
                                     // Set all flags to true
                                     validConfirmEndPollInput = true;            // Current Level
@@ -385,9 +381,9 @@ public class AdminMenu {
         SortedList<Poll> availablePollList = new SortedList<>();
 
         // Get list of available polls
-        for(int i=0; i<pollLinkedList.size(); i++) {
-            if(pollLinkedList.get(i).isOpen()) {
-                availablePollList.add(pollLinkedList.get(i));
+        for(int i=0; i<IdolVoting.getPollLinkedList().size(); i++) {
+            if(IdolVoting.getPollLinkedList().get(i).isOpen()) {
+                availablePollList.add(IdolVoting.getPollLinkedList().get(i));
             }
         }
         
@@ -412,7 +408,7 @@ public class AdminMenu {
             
             if(curVotingPollIndexInput > 0 && curVotingPollIndexInput <= availablePollList.size()) {
                 // Proceed
-                curVotingPollIndex = curVotingPollIndexInput;
+                IdolVoting.setCurVotingPollIndex(curVotingPollIndexInput);
                 
             } else {
                 // If invalid endPollInput
@@ -423,8 +419,4 @@ public class AdminMenu {
         
         return -1;
     }
-    
-
-    
-
 }
