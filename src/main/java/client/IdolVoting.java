@@ -156,6 +156,9 @@ public class IdolVoting {
     public static void displayMainMenu(String[] menuItemArr) {
         // Display Main Menu
         System.out.println("");
+        
+        System.out.println("Welcome to TARUMT Idol Voting System");
+        
         for(int i=0; i<menuItemArr.length; i++) {
             System.out.println((i+1) + ". " + menuItemArr[i]);
         }
@@ -193,20 +196,31 @@ public class IdolVoting {
                     
         // Display the list of all polls
         System.out.println("\nBelow is the list of all Polls: ");
-        System.out.printf("%4s %-15s %11s\n","No.", "Poll Name", "Total Votes");
+        System.out.printf("| %4s | %-15s | %11s |\n","No.", "Poll Name", "Total Votes");
+        System.out.printf("|%38s|\n", AdminMenu.centerString("", 38, '-'));
         for(int i=0; i<pollList.size(); i++) {
-            System.out.printf("%4s %-15s %11s\n", (i+1) + ". ", pollList.get(i).getName(), pollList.get(i).getTotalVotes());
+            System.out.printf("| %4s | %-15s | %11s |\n", (i+1) + ". ", pollList.get(i).getName(), pollList.get(i).getTotalVotes());
         }
         System.out.println("");
     }
     
     public static void displayVoteeList(ListInterface<Votee> voteeList) {
         // Display the list of matchced votee
-        System.out.println("\nBelow is the list of Votee that matched the entered name:");
-        System.out.printf("%4s %-8s %-10s %-20s","No.", "Votee ID", "Votee Name", "Votee Desc");
-        for(int i=0; i<voteeList.size(); i++) {
-            System.out.printf("%4s %-8s %-10s %-20s", (i+1) + ". ", voteeList.get(i).getId(), voteeList.get(i).getName(), voteeList.get(i).getDescription());
+        
+        // Header
+        System.out.println("\nBelow is the list of Votee in the poll:");
+        System.out.printf("| %4s | %-8s | %-22s | %-75s |\n","No.", "Votee ID", "Votee Name", "Votee Description");
+        System.out.printf("| %118s |\n", AdminMenu.centerString("", 118, '-'));
+        
+        // Content
+        if(voteeList.isEmpty()) {
+            AdminMenu.displayErrMessage("Votee Not Found", "There is no Votee in the list");
+        } else {
+            for(int i=1; i<=voteeList.size(); i++) {
+                System.out.printf("| %4s | %-8s | %-22s | %-75s |\n", i + ". ", voteeList.getEntry(i).getId(), voteeList.getEntry(i).getName(), voteeList.getEntry(i).getDescription());
+            }
         }
+        
         System.out.println("\n");
     }
     
@@ -313,13 +327,42 @@ public class IdolVoting {
             
             if(curVotingPollIndexInput > 0 && curVotingPollIndexInput <= availablePollList.size()) {
                 // Proceed
-                curVotingPollIndex = curVotingPollIndexInput;
+                curVotingPollIndex = curVotingPollIndexInput - 1;
                 return curVotingPollIndex;
                 
             } else {
                 // If invalid endPollInput
 
                 System.err.println("\nPlease enter a number that is in the range of (1 - " + availablePollList.size() + "). Please try again\n");
+            }
+        }
+        
+        return -1;
+    }
+    
+    public static int getCurVotingPollIndexAll() {
+        boolean validCurVotingPollIndex = false;
+        
+        while(!validCurVotingPollIndex) {
+            ArrayList<Poll> allPollList = getAllPolls();
+                    
+            // Display Available Polls
+            displayAllPolls();
+
+            // Get input from user
+            System.out.print("Please select a poll to proceed: ");
+            int curVotingPollIndexInput = sc.nextInt();
+            sc.nextLine();
+            
+            if(curVotingPollIndexInput > 0 && curVotingPollIndexInput <= allPollList.size()) {
+                // Proceed
+                curVotingPollIndex = curVotingPollIndexInput - 1;
+                return curVotingPollIndex;
+                
+            } else {
+                // If invalid endPollInput
+
+                System.err.println("\nPlease enter a number that is in the range of (1 - " + allPollList.size() + "). Please try again\n");
             }
         }
         

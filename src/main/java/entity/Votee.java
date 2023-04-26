@@ -9,13 +9,12 @@ public class Votee implements Comparable <Votee> {
     private String name;
     private String description;
     private int totalVotes;     // Include all votes from different poll
-    private int previousCount = 1;
+    private static int previousCount = 0;
     
     public Votee(String name, String description) {
-        this.id = "V" + String.format("%03d", previousCount);
+        this.id = "V" + String.format("%03d", ++previousCount);
         this.name = name;
         this.description = description;
-        this.previousCount++;
     }
 
 

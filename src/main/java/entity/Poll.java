@@ -6,6 +6,7 @@ import adt.SortedListInterface;
 import adt.MapInterface;
 import adt.ArrayList;
 import adt.LinkedList;
+import java.util.Set;
 
 /**
  *
@@ -123,7 +124,7 @@ public class Poll implements Comparable <Poll> {
         // Getter (LinkedList votee) for VoterMenu
         ListInterface<Votee> voteeList = new LinkedList<>();
         
-        for (MapInterface.Entry<Votee, SortedListInterface<Voter>> entry : getVotedList().entrySet()) {
+        for (MapInterface.Entry<Votee, Integer> entry : pollStatus.getVoteCount().entrySet()) {
             voteeList.add(entry.getKey());
         }
         return voteeList;
@@ -136,10 +137,14 @@ public class Poll implements Comparable <Poll> {
     public void updateVotee(Votee oldVotee, Votee newVotee) {
         MapInterface<Votee, Integer> updatedMap = new HashMap<>();
         
+        oldVotee.setName(newVotee.getName());
+        oldVotee.setDescription(newVotee.getDescription());
+        
+        
         for (MapInterface.Entry<Votee, Integer> entry : pollStatus.getVoteCount().entrySet()) {
             if (entry.getKey().equals(oldVotee)) {
                 // Copy the old value and replace by new key
-                updatedMap.put(newVotee, entry.getValue());
+                updatedMap.put(oldVotee, entry.getValue());
             } else {
                 updatedMap.put(entry.getKey(), entry.getValue());
             }
@@ -148,8 +153,10 @@ public class Poll implements Comparable <Poll> {
         pollStatus.setVoteCount(updatedMap);
     }
     
-    public void removeVotee(Votee votee) {
+    public Votee removeVotee(Votee votee) {
         pollStatus.getVoteCount().remove(votee);
+        
+        return votee;
     }
     
     public ListInterface<Votee> searchVotee(String voteeName) {
@@ -233,6 +240,9 @@ public class Poll implements Comparable <Poll> {
         }
         return voteeArrList;
     }   
+
+    
+    
  
     
     // Comparable Methods

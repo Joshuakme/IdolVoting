@@ -5,6 +5,7 @@ import entity.Admin;
 import entity.Votee;
 import entity.Poll;
 import adt.ListInterface;
+import adt.MapInterface;
 import adt.SortedList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ public class AdminMenu {
     public static void main(String[] args) {
         // Constant
         String[][] MENU_ITEM_ARR = {
-            {"Votee", "Create Votee", "Update Votee", "Delete Votee"},
+            {"Votee", "Create Votee", "Update Votee", "Delete Votee", "View Votee List"},
             {"Poll", "Create Poll", "Start Poll", "End Poll", "View Poll List"},
             {"Login"},
             {"Return to Main Menu"}
@@ -58,12 +59,12 @@ public class AdminMenu {
                         break;
                     }
                 case 3:
-                    if (!IdolVoting.isIsLogged()) {
+                    if (IdolVoting.isIsLogged()) {
                         loginNotify();
+                        loginAdmin();
                     } else {
                         loginAdmin();       
                     }
-                    loginAdmin();
                     break;
                 case 4:
                     notExit = false;
@@ -94,8 +95,8 @@ public class AdminMenu {
     }
     
     public static void loginNotify() {
-        System.out.printf("%33s\n", centerString(" Login Required! ", 33, '-'));
-        System.out.println("| Please proceed to login first |");
+        System.out.printf("%33s\n", centerString(" Already Logged In! ", 33, '-'));
+        System.out.println("|   You are already logged in!  |");
         System.out.printf("%33s\n", centerString("", 33, '-'));
     }
     
@@ -105,7 +106,7 @@ public class AdminMenu {
         ListInterface<String> splittedDesc = new ArrayList<>();
         
         // Title
-        System.out.printf("\n%33s\n", centerString(title, 33, '-'));
+        System.out.printf("\n%33s\n", centerString(" " + title + " ", 33, '-'));
         
         // Content
         if(descTextCount > 33) {
@@ -132,6 +133,7 @@ public class AdminMenu {
                     
                     while(!validCreateVoteeInput) {
                             // - Get new Votee details
+                        System.out.println("");
                         System.out.println("Please enter the details of the new votee in the format(Name, Description)");
                         System.out.println("Example: Joshua Koh, A popular Malaysian singer and songwriter.");
                         System.out.print("New Votee Details: ");
@@ -145,7 +147,7 @@ public class AdminMenu {
                             Votee newVotee = new Votee(newVoteeDetailArr[0], newVoteeDetailArr[1]);
 
                             // Create New Votee
-                            IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).addVotee(newVotee);
+                            IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndex() + 1).addVotee(newVotee);
                             
                             // break loop
                             validCreateVoteeInput = true;
@@ -154,9 +156,9 @@ public class AdminMenu {
                             System.out.println("New Votee (" + newVotee.getName()+ ") created successfully!!");
                         } else if (newVoteeDetailArr.length < 2) {
                             
-                            displayErrMessage(" Invalid Input! ", "You have entered too few information. Please try again!");
+                            displayErrMessage("Invalid Input!", "You have entered too few information. Please try again!");
                         } else {
-                            displayErrMessage(" Invalid Input! ", "You have entered too much information. Please try again!");
+                            displayErrMessage("Invalid Input!", "You have entered too much information. Please try again!");
                         }  
                     }
                     break;
@@ -165,18 +167,16 @@ public class AdminMenu {
                     boolean validUpdateVoteeInput = false;
                     
                     while(!validUpdateVoteeInput) {
-                        System.out.print("Please enter the Votee Name you would like to update: ");
-                        String updateVoteeName = sc.nextLine();
-
-                        // Get list of votee that matched the name of the entered name
-                        ListInterface<Votee> searchedVoteeList = IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).searchVotee(updateVoteeName);
+                        // Get Votee List in the poll
+                        int updateVoteePollIndex = IdolVoting.getCurVotingPollIndexAll();
+                        ListInterface<Votee> updateVoteeList = IdolVoting.getPollLinkedList().getEntry(updateVoteePollIndex + 1).getVoteeList();
                         
                         // If search result is not null
-                        if(searchedVoteeList != null) {
+                        if(!updateVoteeList.isEmpty() && updateVoteeList != null) {
                             boolean validselectedVoteeIndex = false;
                             
                             while(!validselectedVoteeIndex) {
-                                IdolVoting.displayVoteeList(searchedVoteeList);
+                                IdolVoting.displayVoteeList(updateVoteeList);
 
                                 // Get confirmed Votee
                                 System.out.print("Please select the Votee you would like to update: ");
@@ -184,16 +184,16 @@ public class AdminMenu {
                                 sc.nextLine();
 
                                 // Check if valid selectedVoteeIndex
-                                if(selectedVoteeIndex > 0 && selectedVoteeIndex < searchedVoteeList.size()) {
+                                if(selectedVoteeIndex > 0 && selectedVoteeIndex < updateVoteeList.size()) {
                                     boolean validUpdatedVoteeDetails = false;
-                                    
+
                                     while(!validUpdatedVoteeDetails) {
                                         // Get updated detail of the selected Votee
                                         System.out.println("Please enter the updated detail: ");
 
-                                        System.out.println("Old: " + searchedVoteeList.get(selectedVoteeIndex).getId() + ", " + searchedVoteeList.get(selectedVoteeIndex).getName() + ", " +
-                                                            searchedVoteeList.get(selectedVoteeIndex).getDescription());
-                                        System.out.print("New: " + searchedVoteeList.get(selectedVoteeIndex).getId() + ", ");
+                                        System.out.println("Old: " + updateVoteeList.getEntry(selectedVoteeIndex).getId() + ", " + updateVoteeList.getEntry(selectedVoteeIndex).getName() + ", " +
+                                                            updateVoteeList.getEntry(selectedVoteeIndex).getDescription());
+                                        System.out.print("New: " + updateVoteeList.getEntry(selectedVoteeIndex).getId() + ", ");
 
                                         String updatedVoteeDetails = sc.nextLine();
 
@@ -205,7 +205,7 @@ public class AdminMenu {
                                             Votee updatedVotee = new Votee(updatedVoteeDetailArr[0],updatedVoteeDetailArr[1]);
 
                                             // Update the selected Votee detail
-                                            IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).updateVotee(searchedVoteeList.get(selectedVoteeIndex), updatedVotee);
+                                            IdolVoting.getPollLinkedList().getEntry(updateVoteePollIndex + 1).updateVotee(updateVoteeList.getEntry(selectedVoteeIndex), updatedVotee);
                                             //admin.updateVotee(updatedVotee);
 
                                             // break loop
@@ -218,21 +218,22 @@ public class AdminMenu {
                                             System.out.println("Updated Votee (" + updatedVotee.getName()+ ") updated successfully!!");
                                         }
                                         else if (updatedVoteeDetailArr.length < 2) {
-                                            displayErrMessage(" Invalid Input! ", "You have entered too few information. Please try again!");
+                                            displayErrMessage("Invalid Input!", "You have entered too few information. Please try again!");
                                         } else {
-                                            displayErrMessage(" Invalid Input! ", "You have entered too much information. Please try again!");
+                                            displayErrMessage("Invalid Input!", "You have entered too much information. Please try again!");
                                         }  
                                     } 
                                 } else {
                                     // If invalid selectedVoteeIndex
 
-                                    displayErrMessage(" Invalid Number! ", "Please enter a number that is in the range of (1 - " + searchedVoteeList.size() + "). Please try again");
+                                    displayErrMessage("Invalid Number!", "Please enter a number that is in the range of (1 - " + updateVoteeList.size() + "). Please try again");
                                 }
-                            }
+                            }  
                         } else {
                             // If search result is null
                             
-                            displayErrMessage("Votee Not Found", "There is no Votee in the list that matched the entered name. Please try again");
+                            displayErrMessage("Votee Not Found", "There is no Votee in the list. Please try again");
+                            validUpdateVoteeInput = true;
                         }
                     }       
                     break;
@@ -241,18 +242,16 @@ public class AdminMenu {
                     boolean validDeleteVoteeInput = false;
                     
                     while(!validDeleteVoteeInput) {
-                        System.out.print("Please enter the Votee Name you would like to delete: ");
-                        String deleteVoteeName = sc.nextLine();
-                        
-                        // Get list of votee that matched the name of the entered name
-                        ListInterface<Votee> searchedVoteeList = IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).searchVotee(deleteVoteeName);
+                        // Get Votee List in the poll
+                        int deleteVoteePollIndex = IdolVoting.getCurVotingPollIndexAll();
+                        ListInterface<Votee> deleteVoteeList = IdolVoting.getPollLinkedList().getEntry(deleteVoteePollIndex + 1).getVoteeList();
                         
                         // If search result is not null
-                        if(searchedVoteeList != null) {
+                        if(!deleteVoteeList.isEmpty() && deleteVoteeList != null) {
                             boolean validSelectedVoteeIndex = false;
                             
-                            while(!validSelectedVoteeIndex) {    
-                                IdolVoting.displayVoteeList(searchedVoteeList);
+                            while(!validSelectedVoteeIndex) {                       
+                                IdolVoting.displayVoteeList(deleteVoteeList);
 
                                 // Get confirmed Votee
                                 System.out.print("Please select the Votee you would like to delete: ");
@@ -260,38 +259,40 @@ public class AdminMenu {
                                 sc.nextLine();
 
                                 // Check if valid selectedVoteeIndex
-                                if(selectedVoteeIndex > 0 && selectedVoteeIndex <= searchedVoteeList.size()) {
+                                if(selectedVoteeIndex > 0 && selectedVoteeIndex <= deleteVoteeList.size()) {
                                     boolean validConfirmDeleteVoteeInput = false;
                                     
                                     while(!validConfirmDeleteVoteeInput) {
                                         // Print selected Votee detail
                                         System.out.println("Below is the detail of the selected Votee: ");
-                                        System.out.println("Votee ID: " + searchedVoteeList.get(selectedVoteeIndex).getId() + "\n" +
-                                                            "Votee Name: " + searchedVoteeList.get(selectedVoteeIndex).getName() + "\n" +
-                                                            "Votee Description: " + searchedVoteeList.get(selectedVoteeIndex).getDescription() + "\n");
+                                        System.out.println("Votee ID: " + deleteVoteeList.getEntry(selectedVoteeIndex).getId() + "\n" +
+                                                            "Votee Name: " + deleteVoteeList.getEntry(selectedVoteeIndex).getName() + "\n" +
+                                                            "Votee Description: " + deleteVoteeList.getEntry(selectedVoteeIndex).getDescription() + "\n");
 
                                         // Get confirmation from the admin
-                                        System.out.println("Do you confirm to delete the Votee? (Y/N/0) ");
+                                        System.out.println("Do you confirm to delete the Votee? (Y/N) ");
                                         char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
 
                                         if(deleteVoteeConfirmation == 'Y') {
-                                            IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).removeVotee(searchedVoteeList.get(selectedVoteeIndex));
-                                            //admin.deleteVotee(searchedVoteeList.get(selectedVoteeIndex).getId());
+                                            Votee deletedVotee = IdolVoting.getPollLinkedList().getEntry(deleteVoteePollIndex).removeVotee(deleteVoteeList.getEntry(selectedVoteeIndex));
 
                                             // Set all flags to true
                                             validConfirmDeleteVoteeInput = true;    // Current Level
                                             validSelectedVoteeIndex = true;         // Upper Level
                                             validDeleteVoteeInput = true;           // Outmost Level
-                                        } else if(deleteVoteeConfirmation == 'N' || deleteVoteeConfirmation == 0) {
+                                            
+                                            // Successful Message
+                                            System.out.println("Updated Votee (" + deletedVotee.getName()+ ") deleted successfully!!");
+                                        } else if(deleteVoteeConfirmation == 'N') {
                                             validSelectedVoteeIndex = true;
                                         } else {
-                                            System.err.println("Please enter a Y-Yes, N-No, 0-Return to last step");
+                                            System.err.println("Please enter a Y-Yes, N-No");
                                         }
                                     }
                                 } else {
                                     // If invalid selectedVoteeIndex
 
-                                    System.err.println("\nPlease enter a number that is in the range of (1 - " + searchedVoteeList.size() + "). Please try again\n");
+                                    System.err.println("\nPlease enter a number that is in the range of (1 - " + deleteVoteeList.size() + "). Please try again\n");
                                 }
                             } 
                         } else {
@@ -300,6 +301,22 @@ public class AdminMenu {
                             System.err.println("\nThere is no Votee in the list that matched the entered name. Please try again\n");
                         }
                     }
+                    break;
+                case 4:
+                    // View Votee List
+                    int pollIndex = IdolVoting.getCurVotingPollIndexAll();
+                    
+                    // If list is empty
+                        if(IdolVoting.getPollLinkedList().isEmpty()) {
+                            System.err.println("\n\nThere is no polls available to display...\n");
+                            break;
+                        } else {
+                            ListInterface voteeList = IdolVoting.getPollLinkedList().getEntry(pollIndex + 1).getVoteeList();
+                            if(voteeList.isEmpty()) {
+                                displayErrMessage("Votee Not Found", "There is no Votee in the poll");
+                            }
+                            IdolVoting.displayVoteeList(voteeList);
+                        }
                     break;
                 default:
                     break;
@@ -312,11 +329,15 @@ public class AdminMenu {
                     System.out.print("Enter the poll title: ");
                     String pollName = sc.nextLine(); 
                     
+                    // Update the current Voting Poll Index to the latest poll
+                    int createPollIndex = IdolVoting.getCurVotingPollIndexAll();
+                    
                     // Add new Poll object into pollList
                     IdolVoting.getPollLinkedList().add(new Poll(pollName));
                     
-                    // Update the current Voting Poll Index to the latest poll
-                    IdolVoting.setCurVotingPollIndex(IdolVoting.getPollLinkedList().size()-1);
+                    
+                    // Respond Message
+                    System.out.println("The Poll (" + pollName + ") has been created!");
                     break;
                 case 2:
                     // Start Poll          
@@ -446,6 +467,7 @@ public class AdminMenu {
         if (!IdolVoting.isIsLogged()) {
             //login only attempt less than 3 times
             while (!IdolVoting.isIsLogged() && loginTry < 3) {
+                System.out.println("");
                 System.out.printf("%37s\n".replace(' ', '-'), centerString("ADMIN Login", 37));
                 System.out.printf("~ Username  : ");
                 String tempUsername = sc.nextLine();
@@ -457,7 +479,7 @@ public class AdminMenu {
                     if (IdolVoting.getAdmin().validateAccount(tempUsername, tempPassword)) {
                         IdolVoting.setIsLogged(true);
 
-                        System.out.println("Login Successful!!");
+                        System.out.println("\nLogin Successful!!");
                         break;
                     }
                 }
