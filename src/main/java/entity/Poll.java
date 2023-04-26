@@ -5,6 +5,7 @@ import adt.ListInterface;
 import adt.SortedListInterface;
 import adt.MapInterface;
 import adt.ArrayList;
+import adt.LinkedList;
 
 /**
  *
@@ -25,7 +26,7 @@ public class Poll implements Comparable <Poll> {
          this(name, new PollStatus(), new HashMap<>(),false);
     }
      
-    public Poll(String name, SortedListInterface<Votee> voteeList) {
+    public Poll(String name, ListInterface<Votee> voteeList) {
         this(name,new PollStatus(),new HashMap<>(),false);
         
         for(int i=0; i<voteeList.size(); i++) {
@@ -92,9 +93,11 @@ public class Poll implements Comparable <Poll> {
         MapInterface<Votee, Integer> newVote = new HashMap<>();
         
         if (isOpen) {
-            pollStatus.getVoteCount().put(votee, pollStatus.getVoteCount().get(votee) + 1);
-            
-            //pollStatus.setVoteCount(newVote);
+            if(pollStatus.getVoteCount().get(votee) != null) {
+                pollStatus.getVoteCount().put(votee, pollStatus.getVoteCount().get(votee) + 1);
+            } else {
+                pollStatus.getVoteCount().put(votee, 1);
+            }
         } else {
             throw new IllegalStateException("Poll is closed.");
         }
@@ -104,8 +107,28 @@ public class Poll implements Comparable <Poll> {
         votedList.get(votee).add(voter);
     }
     
+    public int getTotalVotes() {
+        int totalVoteCount = 0;
+        
+        for (MapInterface.Entry<Votee, Integer> entry : pollStatus.getVoteCount().entrySet()) {
+            totalVoteCount += entry.getValue();
+        }
+        
+        return totalVoteCount;
+    }
+    
 
     // Votee CRUD
+    public ListInterface<Votee> getVoteeList() {
+        // Getter (LinkedList votee) for VoterMenu
+        ListInterface<Votee> voteeList = new LinkedList<>();
+        
+        for (MapInterface.Entry<Votee, SortedListInterface<Voter>> entry : getVotedList().entrySet()) {
+            voteeList.add(entry.getKey());
+        }
+        return voteeList;
+    }
+    
     public void addVotee(Votee votee) {
         pollStatus.getVoteCount().put(votee, 0);
     }

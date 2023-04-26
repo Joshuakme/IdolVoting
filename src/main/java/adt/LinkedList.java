@@ -167,7 +167,25 @@ public class LinkedList<T> implements ListInterface<T> {
 
     @Override
     public int size() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return numberOfEntries;
+    }
+    
+    public int indexOf(T element) {
+        int index = 0;
+        if (element == null) {
+            for (Node x = firstNode; x != null; x = x.next) {
+                if (x.data == null)
+                    return index;
+                index++;
+            }
+        } else {
+            for (Node x = firstNode; x != null; x = x.next) {
+                if (element.equals(x.data))
+                    return index;
+                index++;
+            }
+        }
+        return -1;
     }
 
     private class Node {

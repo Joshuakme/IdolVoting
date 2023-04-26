@@ -1,10 +1,12 @@
 package client;
 
+import adt.ArrayList;
 import entity.Admin;
 import entity.Votee;
 import entity.Poll;
 import adt.ListInterface;
 import adt.SortedList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -14,43 +16,36 @@ import java.util.Scanner;
 public class AdminMenu {
     // Global util
     private static Scanner sc = new Scanner(System.in);
-    // Global Variables 
-    
-    // Global Status
-    private static boolean isLogged = false;
-    // Global User
-    private static Admin admin;
     
     public static void main(String[] args) {
         // Constant
         String[][] MENU_ITEM_ARR = {
             {"Votee", "Create Votee", "Update Votee", "Delete Votee"},
-            {"Poll", "Start Poll", "End Poll", "View PolL Status"},
-            {"Login"}
+            {"Poll", "Create Poll", "Start Poll", "End Poll", "View Poll List"},
+            {"Login"},
+            {"Return to Main Menu"}
         };
-        
-        // Variables Initialization
-        admin = initAdmin();
         
         // Status Variables
         boolean notExit = true;
         
 
         while(notExit) {
-            System.out.println("\n--- Welcome to ADMIN ---\n");
+            System.out.printf("\n%33s\n", centerString(" Welcome to ADMIN ", 33, '-'));
             
             // Display Admin Menu
             adminMenuLev1(MENU_ITEM_ARR);    
             
-            System.out.print("Please select choice (1 - " + MENU_ITEM_ARR.length + "): ");
+            System.out.print("Select option: ");
             int choiceAdmin = sc.nextInt();
             sc.nextLine();
             
             switch (choiceAdmin) {
                 case 1:
                 case 2:
-                    if(!isLogged) {
+                    if(!IdolVoting.isIsLogged()) {
                         // Error Msg
+                        displayErrMessage(" Login Required! ", "Please Login first to proceed");
                         break;
                     } else {
                         adminMenuLev2(MENU_ITEM_ARR,choiceAdmin);
@@ -63,12 +58,14 @@ public class AdminMenu {
                         break;
                     }
                 case 3:
-                    // Assume admin credentials entered correctly
-                    admin = new Admin();
-                    // Log in process
-                    isLogged = true;
+                    if (!IdolVoting.isIsLogged()) {
+                        loginNotify();
+                    } else {
+                        loginAdmin();       
+                    }
+                    loginAdmin();
                     break;
-                case 0:
+                case 4:
                     notExit = false;
                     break;
                 default:
@@ -76,11 +73,7 @@ public class AdminMenu {
             }
         }
     }
-    
-    // Init Methods
-    public static Admin initAdmin() {
-        return new Admin();
-    }
+
     
     // Display Methods
     public static void adminMenuLev1(String[][] menuItemArr) {          
@@ -100,27 +93,32 @@ public class AdminMenu {
         System.out.print("\n");
     }
     
-    public static void displayAvailablePolls() {
-        // Variables Init
-        SortedList<Poll> availablePollList = getAvailablePolls();
-                    
-        // Display the list of available polls
-        System.out.println("\nBelow is the list of available Polls: ");
-        System.out.printf("%4s %-20s","No.", "Poll Name");
-        for(int i=0; i<availablePollList.size(); i++) {
-            System.out.printf("%4s %-20s", (i+1) + ". ", availablePollList.get(i).getName());
-        }
-        System.out.println("\n");
+    public static void loginNotify() {
+        System.out.printf("%33s\n", centerString(" Login Required! ", 33, '-'));
+        System.out.println("| Please proceed to login first |");
+        System.out.printf("%33s\n", centerString("", 33, '-'));
     }
     
-    public static void displayVoteeList(ListInterface<Votee> voteeList) {
-        // Display the list of matchced votee
-        System.out.println("\nBelow is the list of Votee that matched the entered name:");
-        System.out.printf("%4s %-8s %-10s %-20s","No.", "Votee ID", "Votee Name", "Votee Desc");
-        for(int i=0; i<voteeList.size(); i++) {
-            System.out.printf("%4s %-8s %-10s %-20s", (i+1) + ". ", voteeList.get(i).getId(), voteeList.get(i).getName(), voteeList.get(i).getDescription());
+    public static void displayErrMessage(String title, String description) {
+        int titleTextCount = title.length();
+        int descTextCount = description.length();
+        ListInterface<String> splittedDesc = new ArrayList<>();
+        
+        // Title
+        System.out.printf("\n%33s\n", centerString(title, 33, '-'));
+        
+        // Content
+        if(descTextCount > 33) {
+            splittedDesc = splitString(description, 33 - 4);
+            
+            for(int i=0; i<splittedDesc.size(); i++) {
+                System.out.println("| " + splittedDesc.get(i) + " |");
+            }
+        } else {
+            System.out.printf("| %29s |\n", centerString(description, 29));
         }
-        System.out.println("\n");
+        // Footer
+        System.out.printf("%33s\n\n", centerString("", 33, '-'));
     }
     
     // Operation Methods
@@ -155,9 +153,10 @@ public class AdminMenu {
                             // Successful Message
                             System.out.println("New Votee (" + newVotee.getName()+ ") created successfully!!");
                         } else if (newVoteeDetailArr.length < 2) {
-                            System.err.println("\nYou have entered too few information. Please try again!\n");
+                            
+                            displayErrMessage(" Invalid Input! ", "You have entered too few information. Please try again!");
                         } else {
-                            System.err.println("\nYou have entered too much information. Please try again!\n");
+                            displayErrMessage(" Invalid Input! ", "You have entered too much information. Please try again!");
                         }  
                     }
                     break;
@@ -177,7 +176,7 @@ public class AdminMenu {
                             boolean validselectedVoteeIndex = false;
                             
                             while(!validselectedVoteeIndex) {
-                                displayVoteeList(searchedVoteeList);
+                                IdolVoting.displayVoteeList(searchedVoteeList);
 
                                 // Get confirmed Votee
                                 System.out.print("Please select the Votee you would like to update: ");
@@ -219,21 +218,21 @@ public class AdminMenu {
                                             System.out.println("Updated Votee (" + updatedVotee.getName()+ ") updated successfully!!");
                                         }
                                         else if (updatedVoteeDetailArr.length < 2) {
-                                            System.err.println("\nYou have entered too few information. Please try again!\n");
+                                            displayErrMessage(" Invalid Input! ", "You have entered too few information. Please try again!");
                                         } else {
-                                            System.err.println("\nYou have entered too much information. Please try again!\n");
+                                            displayErrMessage(" Invalid Input! ", "You have entered too much information. Please try again!");
                                         }  
                                     } 
                                 } else {
                                     // If invalid selectedVoteeIndex
 
-                                    System.err.println("\nPlease enter a number that is in the range of (1 - " + searchedVoteeList.size() + "). Please try again\n");
+                                    displayErrMessage(" Invalid Number! ", "Please enter a number that is in the range of (1 - " + searchedVoteeList.size() + "). Please try again");
                                 }
                             }
                         } else {
                             // If search result is null
                             
-                            System.err.println("\nThere is no Votee in the list that matched the entered name. Please try again\n");
+                            displayErrMessage("Votee Not Found", "There is no Votee in the list that matched the entered name. Please try again");
                         }
                     }       
                     break;
@@ -253,7 +252,7 @@ public class AdminMenu {
                             boolean validSelectedVoteeIndex = false;
                             
                             while(!validSelectedVoteeIndex) {    
-                                displayVoteeList(searchedVoteeList);
+                                IdolVoting.displayVoteeList(searchedVoteeList);
 
                                 // Get confirmed Votee
                                 System.out.print("Please select the Votee you would like to delete: ");
@@ -309,7 +308,7 @@ public class AdminMenu {
             // Poll
             switch(choiceAdminLevel2) {
                 case 1:
-                    // Start Poll
+                    // Create Poll
                     System.out.print("Enter the poll title: ");
                     String pollName = sc.nextLine(); 
                     
@@ -320,50 +319,119 @@ public class AdminMenu {
                     IdolVoting.setCurVotingPollIndex(IdolVoting.getPollLinkedList().size()-1);
                     break;
                 case 2:
+                    // Start Poll          
+                    boolean validStartPollInput = false;
+                    
+                    while(!validStartPollInput) {
+                        // If list is empty
+                        if(IdolVoting.getClosedPolls().isEmpty()) {
+                            System.err.println("\n\nThere is no polls available to start...\n");
+                            break;
+                        } else {
+                            IdolVoting.displayClosedPolls();
+                        
+                            // Get confirmed Votee
+                            System.out.print("Please select the Poll you would like to start: ");
+                            int startPollInput = sc.nextInt();
+                            sc.nextLine();
+
+                            if(startPollInput > 0 && startPollInput <= IdolVoting.getClosedPolls().size()) {
+                                boolean validConfirmStartPollInput = false;
+
+                                while(!validConfirmStartPollInput) {
+                                    // Get confirmation from the admin
+                                    System.out.print("Do you confirm to start this Poll? (Y/N): ");
+                                    char startPollConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
+
+                                    if(startPollConfirmation == 'Y') {
+                                        // Get selected Poll from closedPollList and compare with pollLinkedList
+                                        int startPollIndex = IdolVoting.getPollLinkedList().indexOf(IdolVoting.getClosedPolls().get(startPollInput - 1));
+
+                                        // Start the selected Poll
+                                        IdolVoting.getPollLinkedList().getEntry(startPollIndex + 1).open();
+
+                                        // Change flag status to true
+                                        validConfirmStartPollInput = true;      // Current Level
+                                        validStartPollInput = true;             // Outmost Level
+
+                                        // Respond Message
+                                        System.out.println("The Poll (" + IdolVoting.getPollLinkedList().getEntry(startPollIndex + 1).getName() + ") has started!");
+                                    } else if(startPollConfirmation == 'N') {
+                                        // Change flag status to true
+                                        validConfirmStartPollInput = true;      // Current Level
+                                    } else {
+                                        System.err.println("Please enter a Y-Yes, N-No");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 3:
                     // End Poll
                     boolean validEndPollInput = false;
                         
                     while(!validEndPollInput) {
-                        displayAvailablePolls();
-                        
-                        SortedList<Poll> availablePollList = getAvailablePolls();
-                        
-                        // Get confirmed Votee
-                        System.out.print("Please select the Poll you would like to end: ");
-                        int endPollInput = sc.nextInt();
-                        sc.nextLine();
-                        
-                        // Check if valid endPollInput
-                        if(endPollInput > 0 && endPollInput <= availablePollList.size()) {
-                            boolean validConfirmEndPollInput = false;
-                            
-                            while(!validConfirmEndPollInput) {
-                                // Get confirmation from the admin
-                                System.out.println("Do you confirm to end this Poll? (Y/N/0) ");
-                                char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
-
-                                if(deleteVoteeConfirmation == 'Y') {
-                                    IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex()).end();
-
-                                    // Set all flags to true
-                                    validConfirmEndPollInput = true;            // Current Level
-                                    validEndPollInput = true;                   // Outmost Level
-                                } else if(deleteVoteeConfirmation == 'N' || deleteVoteeConfirmation == 0) {
-                                    validConfirmEndPollInput = true;
-                                } else {
-                                    System.err.println("Please enter a Y-Yes, N-No, 0-Return to last step");
-                                }
-                            }
+                        // If list is empty
+                        if(IdolVoting.getClosedPolls().isEmpty()) {
+                            System.err.println("\n\nThere is no polls available to end...\n");
+                            break;
                         } else {
-                            // If invalid endPollInput
+                            IdolVoting.displayAvailablePolls();
 
-                            System.err.println("\nPlease enter a number that is in the range of (1 - " + availablePollList.size() + "). Please try again\n");
-                        } 
+                            ArrayList<Poll> availablePollList = IdolVoting.getAvailablePolls();
+
+                            // Get confirmed Votee
+                            System.out.print("Please select the Poll you would like to end: ");
+                            int endPollInput = sc.nextInt();
+                            sc.nextLine();
+
+                            // Check if valid endPollInput
+                            if(endPollInput > 0 && endPollInput <= availablePollList.size()) {
+                                boolean validConfirmEndPollInput = false;
+
+                                while(!validConfirmEndPollInput) {
+                                    // Get confirmation from the admin
+                                    System.out.print("Do you confirm to end this Poll? (Y/N): ");
+                                    char deleteVoteeConfirmation = Character.toUpperCase(sc.nextLine().charAt(0));
+
+                                    if(deleteVoteeConfirmation == 'Y') {
+                                        // Get selected Poll from closedPollList and compare with pollLinkedList
+                                        int endPollIndex = IdolVoting.getPollLinkedList().indexOf(IdolVoting.getAvailablePolls().get(endPollInput - 1));
+
+                                        // Start the selected Poll
+                                        IdolVoting.getPollLinkedList().getEntry(endPollIndex + 1).end();
+
+                                        // Set all flags to true
+                                        validConfirmEndPollInput = true;            // Current Level
+                                        validEndPollInput = true;                   // Outmost Level
+                                        
+                                        // Respond Message
+                                        System.out.println("The Poll (" + IdolVoting.getPollLinkedList().getEntry(endPollIndex + 1).getName() + ") has ended!");
+                                    } else if(deleteVoteeConfirmation == 'N') {
+                                        validConfirmEndPollInput = true;
+                                    } else {
+                                        System.err.println("Please enter a Y-Yes, N-No");
+                                    }
+                                }
+                            } else {
+                                // If invalid endPollInput
+
+                                System.err.println("\nPlease enter a number that is in the range of (1 - " + availablePollList.size() + "). Please try again\n");
+                            } 
+                        }
                     }
                     break;
-                case 3:
-                    // View Poll Status
-                    displayPollStatus();
+                case 4:
+                    // View Poll List
+                    
+                    // If list is empty
+                        if(IdolVoting.getClosedPolls().isEmpty()) {
+                            System.err.println("\n\nThere is no polls available to display...\n");
+                            break;
+                        } else {
+                            IdolVoting.displayAllPolls();
+                        }
                     break;
                 default:
                     break;
@@ -371,52 +439,81 @@ public class AdminMenu {
         } 
     }
     
-    public static void displayPollStatus() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    // Utils Methods
+    public static void loginAdmin() {
+        int loginTry = 0;
+        //Check if user logged in
+        if (!IdolVoting.isIsLogged()) {
+            //login only attempt less than 3 times
+            while (!IdolVoting.isIsLogged() && loginTry < 3) {
+                System.out.printf("%37s\n".replace(' ', '-'), centerString("ADMIN Login", 37));
+                System.out.printf("~ Username  : ");
+                String tempUsername = sc.nextLine();
+                System.out.printf("~ Password  : ");
+                String tempPassword = sc.nextLine();
+
+                //Verify login detail with linked list contain
+                for (int i = 1; i <= IdolVoting.getVoterLinkedList().getNumberOfEntries(); i++) {
+                    if (IdolVoting.getAdmin().validateAccount(tempUsername, tempPassword)) {
+                        IdolVoting.setIsLogged(true);
+
+                        System.out.println("Login Successful!!");
+                        break;
+                    }
+                }
+                if (!IdolVoting.isIsLogged()) {
+                    System.out.println("Login Failed, try again...(Attempt " + (loginTry + 1) + ")\n");
+                    loginTry++;
+                }
+
+            }
+        } else {
+            // Logout user
+            logoutAdmin();
+        }
+        System.out.println("\nBack to menu....");
+
     }
     
-    // Util Methods
-    public static SortedList<Poll> getAvailablePolls() {
-        // Variables Init
-        SortedList<Poll> availablePollList = new SortedList<>();
+    public static void logoutAdmin() {
+        System.out.printf("Do you wish to logout? (\"Y\" to log out): ");
+        char logoutAccChoice = Character.toUpperCase(sc.next().charAt(0));
 
-        // Get list of available polls
-        for(int i=0; i<IdolVoting.getPollLinkedList().size(); i++) {
-            if(IdolVoting.getPollLinkedList().get(i).isOpen()) {
-                availablePollList.add(IdolVoting.getPollLinkedList().get(i));
-            }
+        if (logoutAccChoice == 'Y') {
+            System.out.println("Admin " + IdolVoting.getAdmin().getName()
+                    + "(Username: " + IdolVoting.getAdmin().getUsername() + ") has successfully logout.");
+            IdolVoting.setIsLogged(false);
         }
-        
-        return availablePollList;
     }
     
-    public static int getCurVotingPollIndex() {
-        boolean validCurVotingPollIndex = false;
-        
-        while(!validCurVotingPollIndex) {
-            SortedList<Poll> availablePollList = getAvailablePolls();
-                    
-            System.out.println("Below is the list of available Polls");
-        
-            // Display Available Polls
-            displayAvailablePolls();
+    public static String centerString(String s, int size) {
+        return centerString(s, size, ' ');
+    }
 
-            // Get input from user
-            System.out.println("Please select a poll to proceed: ");
-            int curVotingPollIndexInput = sc.nextInt();
-            sc.nextLine();
-            
-            if(curVotingPollIndexInput > 0 && curVotingPollIndexInput <= availablePollList.size()) {
-                // Proceed
-                IdolVoting.setCurVotingPollIndex(curVotingPollIndexInput);
-                
-            } else {
-                // If invalid endPollInput
+    public static String centerString(String s, int size, char pad) {
+        if (s == null || size <= s.length())
+            return s;
 
-                System.err.println("\nPlease enter a number that is in the range of (1 - " + availablePollList.size() + "). Please try again\n");
-            }
+        StringBuilder sb = new StringBuilder(size);
+        for (int i = 0; i < (size - s.length()) / 2; i++) {
+            sb.append(pad);
         }
+        sb.append(s);
+        while (sb.length() < size) {
+            sb.append(pad);
+        }
+        return sb.toString();
+    }
+    
+    public static ListInterface<String> splitString(String text, int n) {
+        ArrayList<String> splittedCharList = new ArrayList<>();
         
-        return -1;
+        String[] results = text.split("(?<=\\G.{" + n + "})");
+        
+        for(int i=0; i<results.length; i++) {
+            splittedCharList.add(results[i]);
+        }
+
+        return splittedCharList;
     }
 }

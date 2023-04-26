@@ -27,6 +27,23 @@ public class User {
         previousId++;
     }
     
+    // Getter & Setter
+     public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
     // Methods
     public boolean validateAccount(String username, String password) {
         if(this.username.equalsIgnoreCase(username)) {

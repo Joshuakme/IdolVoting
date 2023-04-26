@@ -1,7 +1,9 @@
 package client;
+
 import adt.LinkedList;
 import adt.ListInterface;
 import adt.MapInterface;
+import adt.SortedListInterface;
 import entity.Poll;
 import entity.Votee;
 import entity.Voter;
@@ -12,285 +14,280 @@ import java.util.Scanner;
  * @author Lai Chee Sheng
  */
 public class VoterMenu {
-    private static LinkedList<Voter> voterLinkedList  = new LinkedList<>();
-    private static LinkedList<Poll> pollLinkedList  = new LinkedList<>();
     private static Scanner sc = new Scanner(System.in);
-    private static boolean isLogged = false;
-    private static Voter curVoter; 
-    private static int curVoterIndex; 
-    private static int curVotingPollIndex;
+    
     
     public static void main(String[] args) {
 
-        voterLinkedList = initVoter();
-        
         //Menu
         //default Value
         int choice;
-        
-            do{
-                System.out.println("================== VOTER MENU =================");
-                System.out.println("|| 1.Register Voter");
-                System.out.println("|| 2.Login/Logout Voter");
-                System.out.println("|| 3.Cast Vote");
-                System.out.println("|| 4.View total number of voters participated");
-                System.out.println("|| 5.Modify Account Details");
-                System.out.println("|| 6.Delete Account");
-                System.out.println("|| 7.Back to Main Menu");
-                System.out.println("===============================================");   
-                System.out.printf("==>Enter your choice(1-7): ");
-                choice = sc.nextInt();
-                sc.nextLine();
-                
-                switch(choice){
-                 case 1:
+
+        do {
+            System.out.println("================== VOTER MENU =================");
+            System.out.println("|| 1.Register Voter");
+            System.out.println("|| 2.Login/Logout Voter");
+            System.out.println("|| 3.Cast Vote");
+            System.out.println("|| 4.View total number of voters participated");
+            System.out.println("|| 5.Modify Account Details");
+            System.out.println("|| 6.Delete Account");
+            System.out.println("|| 7.Back to Main Menu");
+            System.out.println("===============================================");
+            System.out.printf("==>Enter your choice(1-7): ");
+            choice = sc.nextInt();
+            sc.nextLine();
+            System.out.println();
+
+            switch (choice) {
+                case 1:
                     //Register Voter
                     registerVoter();
                     break;
-                    
-                 case 2:
+
+                case 2:
                     //Login Voter
-                    loginVoter();    
+                    loginVoter();
                     break;
 
-                 case 3:
+                case 3:
                     //Check if user logged in
-                    if(!isLogged){ 
+                    if (!IdolVoting.isIsLogged()) {
                         loginNotify();
-                    }else{
-                        //select Poll
-                        selectPoll();
-
-                        //cast Vote
-                        castVote();
+                    } else {
+                        if(selectPoll()){
+                            //cast Vote
+                            castVote();
+                        }
                     }
                     break;
-                    
-                 case 4:
-                    if(!isLogged){ 
+
+                case 4:
+                    if (!IdolVoting.isIsLogged()) {
                         loginNotify();
-                    }else{
-                        //View number of voters
-                        int numberOfVoter = voterLinkedList.getNumberOfEntries(); //Obtain total voter involved 
+                    } else {
+                        //View number of voters 
+                        int numberOfVoter = IdolVoting.getVoterLinkedList().getNumberOfEntries(); //Obtain total voter involved 
                         System.out.println("The total number of voters currently is " + numberOfVoter + ".\n");
                     }
                     break;
-                    
-                 case 5:
-                    if (!isLogged) {
+
+                case 5:
+                    if (!IdolVoting.isIsLogged()) {
                         loginNotify();
-                    }else{
+                    } else {
                         // Modify voter's details from the list
                         updateVoterMenu();
                     }
                     break;
-                
-                 case 6:
-                    if (!isLogged) {
+
+                case 6:
+                    if (!IdolVoting.isIsLogged()) {
                         loginNotify();
                     } else {
                         // Remove a voter from the list
                         deleteVoterSelf();
                     }
                     break;
-                    
-                 case 7:
+
+                case 7:
                     // Back to User Menu;
+                    IdolVoting.main(null);
                     break;
 
-                 default:
+                default:
                     System.out.println("Invalid choice, try again.");
-                }
-            } while(choice != 7);
-            
-        System.out.println("Back to User Menu...");   
+            }
+        } while (choice != 7);
+
+        System.out.println("Back to User Menu...");
     }
     
-    public static LinkedList<Voter> initVoter() {
-        LinkedList<Voter> voterLinkedList = new LinkedList<>();
-        
-        Voter voter1 = new Voter("V1001","Joshua", "joshua@gmail.com", "Joshhh", "123");
-        Voter voter2 = new Voter("V1002","User404", "user404@gmail.com", "Invalid", "404");
-        
-        voterLinkedList.add(voter1);
-        voterLinkedList.add(voter2);  
-        
-        return voterLinkedList;
-        
-    }
     
-    public static void registerVoter(){
-        System.out.println("\n=====User Registration=============");
+
+    public static void registerVoter() {
+        System.out.println("\n==========USER REGISTRATION=============");
         System.out.printf("||Username: ");
         String tempUsername = sc.nextLine();
         System.out.printf("||Password: ");
         String tempPassword = sc.nextLine();
-
-        System.out.println("\n||Fill in your User Detail");
+        System.out.println("");
         System.out.printf("||Real Name: ");
         String tempName = sc.nextLine();
         System.out.printf("||Email: ");
         String tempEmail = sc.nextLine();
 
+        Voter tempVoter = new Voter("V1003", tempName, tempEmail, tempUsername, tempPassword);
+        IdolVoting.getVoterLinkedList().add(tempVoter);
 
-        Voter tempVoter = new Voter("V1003",tempName, tempEmail, tempUsername, tempPassword);
-        voterLinkedList.add(tempVoter);  
+        System.out.println("\n You has successfully register an account. ");
     }
-    
-    public static void loginVoter(){
+
+    public static void loginVoter() {
         int loginTry = 0;
         //Check if user logged in
-        if(!isLogged){ 
+        if (!IdolVoting.isIsLogged()) {
             //login only attempt less than 3 times
-            while(!isLogged  && loginTry < 3){
-                System.out.printf("User Login\n");
-                System.out.printf("Username: ");
+            while (!IdolVoting.isIsLogged() && loginTry < 3) {
+                System.out.println("=============LOGIN USER=============");
+                System.out.printf("|| Username  : ");
                 String tempUsername = sc.nextLine();
-                System.out.printf("Password: ");
+                System.out.printf("|| Password  : ");
                 String tempPassword = sc.nextLine();
 
                 //Verify login detail with linked list contain
-                for(int i = 1; i < voterLinkedList.getNumberOfEntries(); i++){
-                    if(voterLinkedList.getEntry(i).validateAccount(tempUsername, tempPassword)){
-                        isLogged = true;
-                        curVoter = voterLinkedList.getEntry(i);
+                for (int i = 1; i <= IdolVoting.getVoterLinkedList().getNumberOfEntries(); i++) {
+                    if (IdolVoting.getVoterLinkedList().getEntry(i).validateAccount(tempUsername, tempPassword)) {
+                        IdolVoting.setIsLogged(true);
+                        IdolVoting.setCurVoter(IdolVoting.getVoterLinkedList().getEntry(i));
                         System.out.println("Login Successful!!");
-                        curVoterIndex = i;
+                        IdolVoting.setCurVoterIndex(i);
+                        break;
                     }
                 }
-                if(!isLogged){
-                    System.out.printf("Login Failed, try again...\n");
-                    loginTry++;   
+                if (!IdolVoting.isIsLogged()) {
+                    System.out.println("Login Failed, try again...(Attempt " + (loginTry + 1) + ")\n");
+                    loginTry++;
                 }
-   
+
             }
-        }else{
+        } else {
             //logout voter
             logoutVoter();
         }
         System.out.println("\nBack to menu....");
-        
-    }
-    
-    public static void logoutVoter(){
-        System.out.printf("Do you wish to logout? (\"Y\" to log out): ");
-        char logoutAccChoice = sc.next().charAt(1);
 
-        if(logoutAccChoice == 'Y' || logoutAccChoice == 'y'){
-            System.out.println("Voter " + voterLinkedList.getEntry(curVoterIndex).getVoterName() 
-                    + "(ID: " + voterLinkedList.getEntry(curVoterIndex).getVoterID() + ") has successfully logout.");
-            isLogged = false;
-            curVoterIndex = 0;
-        } 
     }
-    
-    public static void selectPoll(){
-        if(pollLinkedList.isEmpty()){ //if poll empty
-            System.out.println("There is no poll available to vote currently... (back menu)");
-        } else{
-            System.out.println("===========Poll List============");
-            for(int i = 1 ; i < pollLinkedList.getNumberOfEntries(); i++){
-                System.out.println("||" + i + ") " + pollLinkedList.getEntry(i).getName() );
-            }
-            
-            System.out.println("=> Select the poll to vote ( 1 - " + pollLinkedList.getNumberOfEntries() + " ): ");
-            curVotingPollIndex = sc.nextInt();
+
+    public static void logoutVoter() {
+        System.out.printf("Do you wish to logout? (\"Y\" to log out): ");
+        char logoutAccChoice = sc.next().charAt(0);
+
+        if (logoutAccChoice == 'Y' || logoutAccChoice == 'y') {
+            System.out.println("Voter " + IdolVoting.getVoterLinkedList().getEntry(IdolVoting.getCurVoterIndex()).getVoterName()
+                    + "(ID: " + IdolVoting.getVoterLinkedList().getEntry(IdolVoting.getCurVoterIndex()).getVoterID() + ") has successfully logout.");
+            IdolVoting.setIsLogged(false);
         }
     }
-        
-    public static boolean checkVoted(){
+
+    public static boolean selectPoll() {
+        if (IdolVoting.getPollLinkedList().isEmpty()) { //if poll empty
+            System.out.println("There is no poll available to vote currently... (back menu)");
+            return false;
+        } else {
+            System.out.println("===========Poll List============");
+            for (int i = 1; i < IdolVoting.getPollLinkedList().getNumberOfEntries(); i++) {
+                System.out.println("||" + i + ") " + IdolVoting.getPollLinkedList().getEntry(i).getName());
+            }
+
+            System.out.println("=> Select the poll to vote ( 1 - " + IdolVoting.getPollLinkedList().getNumberOfEntries() + " ): ");
+            IdolVoting.setCurVotingPollIndex(sc.nextInt());
+            return true;
+        }
+    }
+
+    public static boolean checkVoted() {
         //Get list of voted Voter from votedList(from poll)
-        Poll curVotingPoll = pollLinkedList.getEntry(curVotingPollIndex);
-        
-        
+        Poll curVotingPoll = IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndex());
+
         //Check and compare the voterID(get from main) with the voterId of list of voted Voter using contain
-        for (MapInterface.Entry<Votee, ListInterface<Voter>> entry : curVotingPoll.getVotedList().entrySet()) {
+        for (MapInterface.Entry<Votee, SortedListInterface<Voter>> entry : curVotingPoll.getVotedList().entrySet()) {
             Votee votee = entry.getKey();
-            ListInterface<Voter> votedList = entry.getValue();
-            
-            if (votedList.contains(curVoter)) {
-                System.out.println("Voter " + curVoter.getVoterID() + " has already voted!");
+            ListInterface<Voter> votedList = (ListInterface<Voter>) entry.getValue();
+
+            if (votedList.contains(IdolVoting.getCurVoter())) {
+                System.out.println("Voter " + IdolVoting.getCurVoter().getVoterID() + " has already voted!");
                 return false;
             } else { //add vote if not yet vote 
-                pollLinkedList.getEntry(curVotingPollIndex).getVotedList();
+                IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndex()).getVotedList();
 
                 //need increase vote number of voteCount in pollStatus
-
-                System.out.println("Voter " + curVoter.getVoterID() + " has been verified and can vote.");
+                System.out.println("Voter " + IdolVoting.getCurVoter().getVoterID() + " has been verified and can vote.");
                 return true;
             }
         }
         return false;
     }
-    
-    public static void castVote(){
-        if(checkVoted()){ //if voter already voted on specified poll
-            System.out.println("Voter " + curVoter.getVoterID() + " has already voted!");      
-       
+
+    public static void castVote() {
+        if (checkVoted()) { //if voter already voted on specified poll
+            System.out.println("Voter " + IdolVoting.getCurVoter().getVoterID() + " has already voted!");
+
         } else { //add vote if not yet vote 
             voteCastableVotee();
-        }     
-            
-    }    
-     
-    public static void voteCastableVotee(){
-        Poll curVotingPoll = pollLinkedList.getEntry(curVotingPollIndex);
-        
+        }
+
+    }
+
+    public static void voteCastableVotee() {
+        Poll curVotingPoll = IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndex());
+
         ListInterface<Votee> voteeList = curVotingPoll.getVoteeList();
-        
+
         System.out.println("Idol List");
         System.out.println("=============================");
-        for(int i = 1 ; i < voteeList.getNumberOfEntries(); i++){
+        for (int i = 1; i < voteeList.size(); i++) {
             System.out.println((i) + ") " + voteeList.getEntry(i).getName());
         }
 
-        System.out.printf("Cast your vote(1-" + voteeList.getNumberOfEntries()+ "): ");
+        System.out.printf("Cast your vote(1-" + voteeList.size() + "): ");
         int idolChoice = sc.nextInt();
         sc.nextLine();
-        
+
         //add vote number to Poll
         curVotingPoll.addVote(voteeList.getEntry(idolChoice));
-        
+
         //add voter record into votedList(from Poll class)
-        curVotingPoll.addVoter(voteeList.getEntry(idolChoice), curVoter);
-                
-        System.out.println("You has successfully voted for " + voteeList.getEntry(idolChoice).getName() + ".");       
-            
+        curVotingPoll.addVoter(voteeList.getEntry(idolChoice), IdolVoting.getCurVoter());
+
+        System.out.println("You has successfully voted for " + voteeList.getEntry(idolChoice).getName() + ".");
+
     }
-    
-    public static void updateVoterMenu(){
+
+    public static void updateVoterMenu() {
         int updateChoice;
-        do{
-            System.out.println("=======Update Voter Info==================");
+        do {
+            //User Info
+            System.out.println("\n===============USER INFO================");
+            System.out.println("|| ID        : " + IdolVoting.getCurVoter().getVoterID());
+            System.out.println("|| Username  : " + IdolVoting.getCurVoter().getUsername());
+            System.out.println("|| Email     : " + IdolVoting.getCurVoter().getEmail());
+            System.out.println("|| Real Name : " + IdolVoting.getCurVoter().getVoterName());
+
+            //Selection Menu
+            System.out.println("-------------Update Voter Info------------");
             System.out.println("|| 1) Username");
             System.out.println("|| 2) Email");
             System.out.println("|| 3) Password");
             System.out.println("|| 4) Back to menu");
             System.out.println("==========================================");
+            System.out.printf("| Enter your choice (1-4): ");
             updateChoice = sc.nextInt();
             sc.nextLine();
 
-            switch(updateChoice) {
-                case 1: case 2: case 3:
+            switch (updateChoice) {
+                case 1:
+                case 2:
+                case 3:
                     updateVoter(updateChoice);
                     break;
-                    
+
                 case 4:
                     System.out.println("Back to Menu...");
                     break;
-                    
+
                 default:
                     System.out.println("Invalid choice, try again.");
             }
-        }while(updateChoice != 4);  
+        } while (updateChoice != 4);
     }
-    
-    public static void updateVoter(int updateOption){    
+
+    public static void updateVoter(int updateOption) {
         //declare temporary info
-        String tempUpdatedUsername = curVoter.getUsername();
-        String tempUpdatedEmail = curVoter.getEmail();
-        String tempUpdatedPassword = curVoter.getPassword();
         
+        String tempUpdatedUsername = IdolVoting.getCurVoter().getUsername();
+        String tempUpdatedEmail = IdolVoting.getCurVoter().getEmail();
+        String tempUpdatedPassword = IdolVoting.getCurVoter().getPassword();
+
         switch (updateOption) {
             case 1:
                 System.out.printf("\nNew Username: ");
@@ -307,39 +304,40 @@ public class VoterMenu {
             default:
                 break;
         }
-        
-        Voter tempUpdatedVoter = new Voter(curVoter.getVoterID(),curVoter.getVoterName(), tempUpdatedEmail, tempUpdatedUsername, tempUpdatedPassword);
-        
+
+        Voter tempUpdatedVoter = new Voter(IdolVoting.getCurVoter().getVoterID(), IdolVoting.getCurVoter().getVoterName(), tempUpdatedEmail, tempUpdatedUsername, tempUpdatedPassword);
+
         //Replace new info into existed Voter
-        voterLinkedList.replace(curVoterIndex, tempUpdatedVoter);
-        
+        IdolVoting.getVoterLinkedList().replace(IdolVoting.getCurVoterIndex(), tempUpdatedVoter);
+
         //Set updated Voter as logged user
-        curVoter = voterLinkedList.getEntry(curVoterIndex);
-        
+        IdolVoting.setCurVoter( IdolVoting.getVoterLinkedList().getEntry(IdolVoting.getCurVoterIndex()));
+        System.out.println("\nVoter Detail changed successfully. ");
+
     }
-    
-    public static void deleteVoterSelf(){
-        System.out.println("===========Account Delete Confirmation===========");
+
+    public static void deleteVoterSelf() {
+        System.out.println("\n===========Account Delete Confirmation===========");
         System.out.println("|| Once you delete your account, you won't     ||");
         System.out.println("|| be able to view or vote for the idol.       ||");
         System.out.println("|| ____________________________________________||");
         System.out.printf("|| Are you sure to delete? (\"Y\" to confirm): ");
-        char deleteAccChoice = sc.next().charAt(1);
-        
-        if(deleteAccChoice == 'Y' || deleteAccChoice == 'y'){
-            System.out.println("Voter " + voterLinkedList.getEntry(curVoterIndex).getVoterName() 
-                    + "(ID: " + voterLinkedList.getEntry(curVoterIndex).getVoterID() + ") has successfully deleted.");
-            voterLinkedList.remove(curVoterIndex); 
-            isLogged = false; //Logout user
-            curVoterIndex = 0; 
-            
+        char deleteAccChoice = sc.next().charAt(0);
+
+        if (deleteAccChoice == 'Y' || deleteAccChoice == 'y') {
+            System.out.println("Voter " + IdolVoting.getVoterLinkedList().getEntry(IdolVoting.getCurVoterIndex()).getVoterName()
+                    + "(ID: " + IdolVoting.getVoterLinkedList().getEntry(IdolVoting.getCurVoterIndex()).getVoterID() + ") has successfully deleted.");
+            IdolVoting.getVoterLinkedList().remove(IdolVoting.getCurVoterIndex());
+            IdolVoting.setIsLogged(false); //Logout user
+            IdolVoting.setCurVoterIndex(0);
+
         }
         System.out.println("\nBack to menu....");
     }
-    
-    public static void loginNotify(){
+
+    public static void loginNotify() {
         System.out.println("===LOGIN REQUIRED================");
         System.out.println("| Please proceed to login first |");
-        System.out.println("=================================");
+        System.out.println("=================================\n");
     }
 }
