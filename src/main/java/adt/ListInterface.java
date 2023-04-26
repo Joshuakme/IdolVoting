@@ -2,7 +2,7 @@ package adt;
 
 /**
  *
- * @author Joshua Koh Min En
+ * @author Lai Chee Sheng
  */
 public interface ListInterface<T> {
     public boolean add(T newEntry);

@@ -1,9 +1,8 @@
-
 package adt;
 
 /**
  *
- * @author Lenovo
+ * @author Lai Chee Sheng
  */
 public class LinkedList<T> implements ListInterface<T> {
 
@@ -64,27 +63,6 @@ public class LinkedList<T> implements ListInterface<T> {
         }
 
         return isSuccessful;
-    }
-
-    public boolean remove(T anEntry) {
-        if (firstNode == null) {
-            return false;
-        }
-        if (firstNode.next.equals(anEntry)) {
-            firstNode = firstNode.next;
-            numberOfEntries--;
-            return true;
-        }
-        Node currentNode = firstNode;
-        while (currentNode.next != null) {
-            if (currentNode.next.data.equals(anEntry)) {
-                currentNode.next = currentNode.next.next;
-                numberOfEntries--;
-                return true;
-            }
-            currentNode = currentNode.next;
-        }
-        return false;
     }
 
     @Override
