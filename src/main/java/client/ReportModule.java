@@ -5,11 +5,13 @@
  */
 package client;
 
+
 import adt.ArrayList;
 import adt.ListInterface;
 import entity.Poll;
 import entity.Report;
 import entity.Votee;
+
 
 
 import javax.swing.JFrame;
@@ -23,15 +25,18 @@ import java.time.format.DateTimeFormatter;
  * @author limky
  */
 public class ReportModule {
+
     public static void main(String args[]){
         ReportModule rp = new ReportModule();
         //rp.generateSummaryReport();
         rp.generateDetailedReport();
     }
+
     
     public void generateDetailedReport(){
         Report<String, Integer> rpt = new Report<String, Integer>();
         
+
         // Get data result from the main driver (IdolVoting.java)
         Poll currentPoll = IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndex() + 1);
   
@@ -45,7 +50,7 @@ public class ReportModule {
         for(int i=0; i<currentPoll.getPollStatus().getVoteCount().size(); i++) {
             rpt.addADT(sortedVoteeResultList.get(i).getName(), sortedVoteCountResultList.get(i));
         }
-        
+
 //        rpt.addADT("ABC", 1);
 //        rpt.addADT("GHI", 4);
 //        rpt.addADT("CDE",2);
@@ -76,6 +81,7 @@ public class ReportModule {
     public void generateSummaryReport(){
         Report<String, Integer> rpt = new Report<String, Integer>();
         
+
         // Get data result from the main driver (IdolVoting.java)
         Poll currentPoll = IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex());
         
@@ -89,7 +95,7 @@ public class ReportModule {
         for(int i=0; i<currentPoll.getPollStatus().getVoteCount().size(); i++) {
             rpt.addADT(sortedVoteeResultList.get(i).getName(), sortedVoteCountResultList.get(i));
         }
-        
+
 //        rpt.addADT("ABC", 1);
 //        rpt.addADT("GHI", 4);
 //        rpt.addADT("CDE",2);
@@ -120,3 +126,4 @@ public class ReportModule {
         
     }
 }
+
