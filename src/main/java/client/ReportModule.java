@@ -38,7 +38,7 @@ public class ReportModule {
         
 
         // Get data result from the main driver (IdolVoting.java)
-        Poll currentPoll = IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndexAvailable() + 1);
+        Poll currentPoll = IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndexAll() + 1);
   
         ListInterface<Votee> sortedVoteeResultList = currentPoll.descRanking();
         ListInterface<Integer> sortedVoteCountResultList = new ArrayList<>();;

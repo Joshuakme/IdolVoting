@@ -34,7 +34,7 @@ public class VoterMenu {
             System.out.println("|| 6.Delete Account");
             System.out.println("|| 7.Back to Main Menu");
             System.out.println("===============================================");
-            System.out.printf("==>Enter your choice(1-7): ");
+            System.out.print("==>Enter your choice(1-7): ");
             choice = sc.nextInt();
             sc.nextLine();
             System.out.println();
@@ -69,6 +69,12 @@ public class VoterMenu {
                         //View number of voters 
                         int numberOfVoter = IdolVoting.getVoterLinkedList().getNumberOfEntries(); //Obtain total voter involved 
                         System.out.println("The total number of voters currently is " + numberOfVoter + ".\n");
+                        
+                        System.out.printf(" %-8s %-20s\n", " ID ", " Name ");
+                        System.out.printf(" %-8s %-20s\n", " ======= ", " =================== ");
+                        for(int i = 1; i <= IdolVoting.getVoterLinkedList().getNumberOfEntries(); i++){  
+                            System.out.printf(" %-8s %-20s\n", IdolVoting.getVoterLinkedList().getEntry(i).getVoterID(),IdolVoting.getVoterLinkedList().getEntry(i).getUsername());
+                        }
                     }
                     break;
 

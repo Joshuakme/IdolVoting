@@ -12,7 +12,6 @@ import entity.Votee;
 import entity.Voter;
 // Import Util
 import java.util.Scanner;
-import java.util.InputMismatchException;
 
 /**
  * @author Joshua Koh Min En
@@ -95,36 +94,59 @@ public class IdolVoting {
         
         Voter voter1 = new Voter("V1001","Joshua", "joshua@gmail.com", "Joshhh", "123");
         Voter voter2 = new Voter("V1002","User404", "user404@gmail.com", "Invalid", "404");
-        
+        Voter voter3 = new Voter("V1003","KokLoong", "kokloong@gmail.com", "KL", "123");
+        Voter voter4 = new Voter("V1004","Tiffany", "shiacf@gmail.com", "Jossadah", "123");
+        Voter voter5 = new Voter("V1005","geeeeee", "gegeg@gmail.com", "Jwas", "123");
         voterLinkedList.add(voter1);
         voterLinkedList.add(voter2);  
+        voterLinkedList.add(voter3);  
+        voterLinkedList.add(voter4);  
+        voterLinkedList.add(voter5);  
         
         return voterLinkedList;
         
     }
     
-    public static LinkedList<Poll> initPollList(){
+        public static LinkedList<Poll> initPollList(){
         LinkedList<Poll> pollList = new LinkedList<>();
         
         // Init Votee List in every Poll
         ListInterface<Votee> voteeList1 = new ArrayList<>();
         
-        Poll p1 = new Poll("MoonByul");
-        Poll p2 = new Poll("Solar");
-        Poll p3 = new Poll("Hwasa");
-        Poll p4 = new Poll("WheeIn");
+        Poll p1 = new Poll("NKL GF Audition");
+        Poll p2 = new Poll("Sing Selection");
+        Poll p3 = new Poll("Hwasa Selection");
+        Poll p4 = new Poll("WheeIn Audition");
         
         Votee vt1 = new Votee("Kendell Andrin", "Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.");
         Votee vt2 = new Votee("Choi Shan Yeh", "Bring money money money to you and your family");
         Votee vt3 = new Votee("Toh Deh Gong", "Bring peace to your family and home");
-        Votee vt4 = new Votee("Xhou Gong", "Harh? Bla Bla Blaaaaa");
-        
+        Votee vt4 = new Votee("Zhou Gong", "Harh? Bla Bla Blaaaaa");
+        Votee vt5 = new Votee("Nah Tok Gong", "Selamat Sejahtera Guysss");
+        Votee vt6 = new Votee("Soon Wu Kong", "I am the BEST Singer in the world!");
+        Votee vt7 = new Votee("Lee Eun Ji", "Annyeonghasaeyo");
+        Votee vt8 = new Votee("Dua Beh Gong", "Vote me if you like R&B song");
+        Votee vt9 = new Votee("Teh Zhu Gong", "hahaha");
+        Votee vt10 = new Votee("Thomas Soh", "Support Local Singer!!!");
         
         p2.open();
         p2.addVotee(vt1);
         p2.addVotee(vt2);
         p2.addVotee(vt3);
         p2.addVotee(vt4);
+        
+        p3.open();
+        p3.addVotee(vt5);
+        p3.addVotee(vt6);
+        p3.addVotee(vt7);
+        
+        p4.open();
+        p4.addVotee(vt8);
+        p4.addVotee(vt9);
+        
+        p1.open();
+        p1.addVotee(vt10);
+        
         
         for(int i=0; i<457; i++) {
             p2.addVote(vt1);
@@ -140,6 +162,30 @@ public class IdolVoting {
         
         for(int i=0; i<87; i++) {
             p2.addVote(vt4);
+        }
+        
+        for(int i=0; i<1087; i++) {
+            p3.addVote(vt5);
+        }
+        
+        for(int i=0; i<8887; i++) {
+            p3.addVote(vt6);
+        }
+        
+        for(int i=0; i<8541; i++) {
+            p3.addVote(vt7);
+        }
+        
+        for(int i=0; i<5454; i++) {
+            p4.addVote(vt8);
+        }
+        
+        for(int i=0; i<6754; i++) {
+            p4.addVote(vt9);
+        }
+        
+        for(int i=0; i<346; i++) {
+            p1.addVote(vt10);
         }
         
         pollList.add(p1);

@@ -99,7 +99,6 @@ public class Poll implements Comparable <Poll> {
                 if(votee.equals(entry.getKey())) {
                     if(entry.getValue() != null) {
                         entry.setValue(entry.getValue()+1);
-                        System.out.println("Hahahaha: " + entry.getValue());
                     }        
                     else 
                         entry.setValue(1);
@@ -144,7 +143,7 @@ public class Poll implements Comparable <Poll> {
         }
         return voteeList;
     }
-    
+     
     public void addVotee(Votee votee) {
         pollStatus.getVoteCount().put(votee, 0);
     }
@@ -213,15 +212,17 @@ public class Poll implements Comparable <Poll> {
              voteCountArrList.add(entry.getValue());
         }
 
-        for(int i = 1; i<voteCountArrList.size(); i++){
-            Votee tempVotee = voteeArrList.get(i);
-            int temp = voteCountArrList.get(i);
-            int j = i-1;            //j is the position
+        //sorting algorithm
+        //Split the number in 2 group : Sorted & Unsorted 
+        for(int i = 1; i<voteCountArrList.size(); i++){     // initialize the i = 1 
+            Votee tempVotee = voteeArrList.get(i);          //tempVotee is one of the member of unsorted (used to compare with Sorted                           
+            int temp = voteCountArrList.get(i);             
+            int j = i-1;                                    //j is the position
             
-            while(j>=0 && voteCountArrList.get(j)> temp){
+            while(j>=0 && voteCountArrList.get(j)> temp){       //if sorted > Unsorted, it will copy to the right
                  voteeArrList.set(j+1, voteeArrList.get(j));
                  voteCountArrList.set(j+1, voteCountArrList.get(j));
-                 j--;
+                 j--;                                           
             }
              voteeArrList.set(j+1, tempVotee);
              voteCountArrList.set(j+1, temp);
@@ -241,11 +242,11 @@ public class Poll implements Comparable <Poll> {
 
         
         for(int i = 1; i<voteCountArrList.size(); i++){
-            Votee tempVotee = voteeArrList.get(i);
+            Votee tempVotee = voteeArrList.get(i);          
             int temp = voteCountArrList.get(i);
             int j = i-1;            //j is the position
             
-            while(j>=0 && voteCountArrList.get(j)< temp){
+            while(j>=0 && voteCountArrList.get(j)< temp){       //if sorted < Unsorted, it will copy to the right
                  voteeArrList.set(j+1, voteeArrList.get(j));
                  voteCountArrList.set(j+1, voteCountArrList.get(j));
                  j--;
