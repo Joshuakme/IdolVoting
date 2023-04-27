@@ -43,7 +43,10 @@ public class Voter extends User implements Comparable <Voter> {
 
     @Override
     public int compareTo(Voter o) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         int totalVotes = 0;
+ 
+
+        return voterName.compareTo(o.voterName);
     }
 
 }

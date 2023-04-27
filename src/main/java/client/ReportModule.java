@@ -33,7 +33,7 @@ public class ReportModule {
         Report<String, Integer> rpt = new Report<String, Integer>();
         
         // Get data result from the main driver (IdolVoting.java)
-        Poll currentPoll = IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndex() + 1);
+        Poll currentPoll = IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndexAvailable() + 1);
   
         ListInterface<Votee> sortedVoteeResultList = currentPoll.descRanking();
         ListInterface<Integer> sortedVoteCountResultList = new ArrayList<>();;
@@ -77,7 +77,7 @@ public class ReportModule {
         Report<String, Integer> rpt = new Report<String, Integer>();
         
         // Get data result from the main driver (IdolVoting.java)
-        Poll currentPoll = IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndex());
+        Poll currentPoll = IdolVoting.getPollLinkedList().get(IdolVoting.getCurVotingPollIndexAvailable());
         
         ListInterface<Votee> sortedVoteeResultList = currentPoll.descRanking();
         ListInterface<Integer> sortedVoteCountResultList = new ArrayList<>();;

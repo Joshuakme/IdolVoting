@@ -3,6 +3,7 @@ package client;
 import adt.LinkedList;
 import adt.ListInterface;
 import adt.MapInterface;
+import adt.SortedList;
 import adt.SortedListInterface;
 import entity.Poll;
 import entity.Votee;
@@ -175,11 +176,11 @@ public class VoterMenu {
             return false;
         } else {
             System.out.println("===========Poll List============");
-            for (int i = 1; i < IdolVoting.getPollLinkedList().getNumberOfEntries(); i++) {
+            for (int i = 1; i <= IdolVoting.getPollLinkedList().getNumberOfEntries(); i++) {
                 System.out.println("||" + i + ") " + IdolVoting.getPollLinkedList().getEntry(i).getName());
             }
 
-            System.out.println("=> Select the poll to vote ( 1 - " + IdolVoting.getPollLinkedList().getNumberOfEntries() + " ): ");
+            System.out.print("=> Select the poll to vote ( 1 - " + IdolVoting.getPollLinkedList().getNumberOfEntries() + " ): ");
             IdolVoting.setCurVotingPollIndex(sc.nextInt());
             return true;
         }
@@ -192,7 +193,7 @@ public class VoterMenu {
         //Check and compare the voterID(get from main) with the voterId of list of voted Voter using contain
         for (MapInterface.Entry<Votee, SortedListInterface<Voter>> entry : curVotingPoll.getVotedList().entrySet()) {
             Votee votee = entry.getKey();
-            ListInterface<Voter> votedList = (ListInterface<Voter>) entry.getValue();
+            SortedListInterface<Voter> votedList = entry.getValue();
 
             if (votedList.contains(IdolVoting.getCurVoter())) {
                 System.out.println("Voter " + IdolVoting.getCurVoter().getVoterID() + " has already voted!");
@@ -225,7 +226,7 @@ public class VoterMenu {
 
         System.out.println("Idol List");
         System.out.println("=============================");
-        for (int i = 1; i < voteeList.size(); i++) {
+        for (int i = 1; i <= voteeList.size(); i++) {
             System.out.println((i) + ") " + voteeList.getEntry(i).getName());
         }
 

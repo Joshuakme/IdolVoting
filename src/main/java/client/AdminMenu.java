@@ -147,7 +147,7 @@ public class AdminMenu {
                             Votee newVotee = new Votee(newVoteeDetailArr[0], newVoteeDetailArr[1]);
 
                             // Create New Votee
-                            IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndex() + 1).addVotee(newVotee);
+                            IdolVoting.getPollLinkedList().getEntry(IdolVoting.getCurVotingPollIndexAvailable() + 1).addVotee(newVotee);
                             
                             // break loop
                             validCreateVoteeInput = true;

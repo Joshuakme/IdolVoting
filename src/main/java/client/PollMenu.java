@@ -45,7 +45,7 @@ public class PollMenu {
 
                 switch (selection) {
                     case '1': 
-                        pollIndex = IdolVoting.getCurVotingPollIndex();
+                        pollIndex = IdolVoting.getCurVotingPollIndexAll();
                         
                         ArrayList<Votee> defaultVoteeResult = new ArrayList<>();
                         defaultVoteeResult = IdolVoting.getPollLinkedList().getEntry(pollIndex + 1).defaultRanking();
@@ -55,7 +55,7 @@ public class PollMenu {
 
                     case 'a':
                     case 'A': 
-                        pollIndex = IdolVoting.getCurVotingPollIndex();
+                        pollIndex = IdolVoting.getCurVotingPollIndexAll();
                         
                         ArrayList<Votee> descVoteeResult = new ArrayList<>();
                         descVoteeResult = IdolVoting.getPollLinkedList().getEntry(pollIndex + 1).descRanking();
@@ -65,7 +65,7 @@ public class PollMenu {
 
                     case 'b':
                     case 'B':
-                        pollIndex = IdolVoting.getCurVotingPollIndex();
+                        pollIndex = IdolVoting.getCurVotingPollIndexAll();
                         
                         ArrayList<Votee> ascVoteeResult = new ArrayList<>();
                         ascVoteeResult = IdolVoting.getPollLinkedList().getEntry(pollIndex + 1).ascRanking();

@@ -124,6 +124,7 @@ public class IdolVoting {
         p2.addVotee(vt1);
         p2.addVotee(vt2);
         p2.addVotee(vt3);
+        p2.addVotee(vt4);
         
         for(int i=0; i<457; i++) {
             p2.addVote(vt1);
@@ -311,7 +312,7 @@ public class IdolVoting {
         return availablePollList;
     }
     
-    public static int getCurVotingPollIndex() {
+    public static int getCurVotingPollIndexAvailable() {
         boolean validCurVotingPollIndex = false;
         
         while(!validCurVotingPollIndex) {
@@ -394,6 +395,11 @@ public class IdolVoting {
     public static Admin getAdmin() {
         return admin;
     }
+
+    public static int getCurVotingPollIndex() {
+        return curVotingPollIndex;
+    }
+    
     
     // Setter
     public static void setVoterLinkedList(LinkedList<Voter> voterLinkedList) {

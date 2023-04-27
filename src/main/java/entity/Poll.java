@@ -6,6 +6,7 @@ import adt.SortedListInterface;
 import adt.MapInterface;
 import adt.ArrayList;
 import adt.LinkedList;
+import adt.SortedList;
 import java.util.Set;
 
 /**
@@ -93,11 +94,18 @@ public class Poll implements Comparable <Poll> {
     public void addVote(Votee votee) {
         MapInterface<Votee, Integer> newVote = new HashMap<>();
         
-        if (isOpen) {
-            if(pollStatus.getVoteCount().get(votee) != null) {
-                pollStatus.getVoteCount().put(votee, pollStatus.getVoteCount().get(votee) + 1);
-            } else {
-                pollStatus.getVoteCount().put(votee, 1);
+        if (isOpen) { 
+            for (MapInterface.Entry<Votee, Integer> entry : pollStatus.getVoteCount().entrySet()) {
+                if(votee.equals(entry.getKey())) {
+                    if(entry.getValue() != null) {
+                        entry.setValue(entry.getValue()+1);
+                        System.out.println("Hahahaha: " + entry.getValue());
+                    }        
+                    else 
+                        entry.setValue(1);
+                } else {
+                    pollStatus.getVoteCount().put(entry.getKey(), entry.getValue());
+                }
             }
         } else {
             throw new IllegalStateException("Poll is closed.");
@@ -105,7 +113,14 @@ public class Poll implements Comparable <Poll> {
     }
    
     public void addVoter(Votee votee, Voter voter){
-        votedList.get(votee).add(voter);
+        if(!votedList.containsKey(votee)) {
+            SortedListInterface<Voter> voterList = new SortedList<>();
+            voterList.add(voter);
+            
+            votedList.put(votee, voterList);
+        } else {
+            votedList.get(votee).add(voter);
+        }
     }
     
     public int getTotalVotes() {
